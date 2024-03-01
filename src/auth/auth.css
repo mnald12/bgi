@@ -1,0 +1,284 @@
+.selection {
+  padding: 12px;
+  display: flex;
+  gap: 16px;
+}
+
+.selection-left {
+  width: 260px;
+  height: auto;
+  animation: toLeft 2s ease-in-out;
+  z-index: 20;
+}
+
+.selection-left img {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.selection-right {
+  width: 250px;
+  height: auto;
+  animation: toRight 2s ease-in-out;
+}
+
+.selection-right h3 {
+  font-size: 36px;
+}
+
+.selection-rigt small {
+  font-size: 14px;
+}
+
+.selection-right p {
+  margin-top: 16px;
+  font-weight: 600;
+}
+
+.hr-centered {
+  width: 100%;
+  height: auto;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.hr {
+  width: 100%;
+  height: 1px;
+  background: black;
+  position: absolute;
+  top: auto;
+}
+
+.hr-centered h2 {
+  background: white;
+  z-index: 4;
+  padding: 0 10px;
+  transform: translateY(-2px);
+}
+
+.selection-right small {
+  display: block;
+  font-weight: 500;
+  transform: translate(2px, -6px);
+}
+
+.selection-right button {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border: none;
+  outline: none;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+    rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 18px;
+  border-radius: 5px;
+}
+
+.admin-btn {
+  background: rgb(13, 202, 13);
+  color: aliceblue;
+}
+
+.keeper-btn {
+  background: royalblue;
+  color: aliceblue;
+}
+
+@keyframes toLeft {
+  from {
+    transform: translateX(50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes toRight {
+  from {
+    transform: translateX(-55%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* forms*/
+
+.forms {
+  width: 300px;
+  height: auto;
+  padding: 20px;
+  border-radius: 12px;
+  color: black;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  animation: show 1s ease-in-out;
+  position: relative;
+  z-index: 2;
+}
+
+.btn-back {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: red;
+  position: absolute;
+  top: 0;
+  right: -50px;
+  border-radius: 50%;
+  font-size: 36px;
+  animation: unhide 3s ease-in-out;
+  z-index: -2;
+}
+
+@keyframes unhide {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes show {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.forms .headers {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.headers h3 {
+  display: block;
+  width: 60px;
+  height: 60px;
+  font-size: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admins {
+  background: rgb(13, 202, 13);
+}
+
+.keepers {
+  background: royalblue;
+}
+
+.headers .icn {
+  color: aliceblue;
+}
+
+.login-text {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.forms form {
+  margin-top: 10px;
+}
+
+.inputs-group {
+  padding-bottom: 10px;
+  position: relative;
+  padding-top: 20px;
+}
+
+.inputs-group label {
+  display: block;
+  font-size: 17px;
+  position: absolute;
+  left: 10px;
+  top: 26px;
+  z-index: -1;
+  transition: 0.6s;
+}
+
+.inputs-group input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 17px;
+  border: none;
+  outline: none;
+  background: transparent;
+  box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 1px, rgba(0, 0, 0, 0.07) 0px 2px 2px,
+    rgba(0, 0, 0, 0.07) 0px 4px 4px, rgba(0, 0, 0, 0.07) 0px 6px 6px;
+  z-index: 4;
+  color: #3e3e3e;
+}
+
+.inputs-group input:focus + label {
+  top: 0;
+}
+
+.has-value {
+  top: 0 !important;
+}
+
+.btns {
+  text-align: right;
+  margin-top: 12px;
+}
+
+.btns button {
+  width: 100%;
+  height: auto;
+  padding: 12px;
+  color: aliceblue;
+  border: none;
+  outline: none;
+  box-shadow: 0 0 3px 0 black;
+  border-radius: 5px;
+}
+
+.admin {
+  background: rgb(121, 234, 121);
+}
+.keeper {
+  background: rgb(110, 139, 226);
+}
+
+.error-msg {
+  width: 100%;
+  height: auto;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  top: -60px;
+  border-radius: 6px;
+  background: rgb(217, 83, 83);
+  color: aliceblue;
+}
+
+.forgot {
+  margin-top: 30px;
+}

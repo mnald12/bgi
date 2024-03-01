@@ -1,0 +1,188 @@
+:root {
+  --blue: blue;
+  --white: white;
+  --orange: orange;
+  --red: red;
+  --green: green;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #1716164e;
+  border-radius: 6px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.bg-green {
+  background-color: var(--green) !important;
+}
+
+.bg-red {
+  background-color: var(--red) !important;
+}
+
+.color-green {
+  color: var(--green) !important;
+}
+
+.color-red {
+  color: var(--red) !important;
+}
+
+.color-white {
+  color: var(--white);
+}
+
+.flex-container {
+  width: 100%;
+  height: 100vh;
+  margin: 0 auto;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  max-width: 1600px;
+}
+
+.contents {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  padding-right: 6px;
+  transition: 1s;
+}
+
+button {
+  cursor: pointer;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 400;
+  margin-left: 6px;
+  padding-bottom: 12px;
+  padding-top: 10px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.page-header .search-bars {
+  width: auto;
+  height: auto;
+  position: absolute;
+  right: 6px;
+  top: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-bars input {
+  width: 100%;
+  height: auto;
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em,
+    rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+  padding-left: 36px;
+  background-color: white;
+  background-image: url(../images/loupe.png);
+  background-position: 10px;
+  background-size: 20px 20px;
+  background-repeat: no-repeat;
+}
+
+.add-bar {
+  width: auto;
+  border: none;
+  outline: none;
+  background: forestgreen;
+  color: white;
+  padding: 10px 16px;
+  box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em,
+    rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+  border-radius: 5px;
+  white-space: nowrap !important;
+}
+
+table {
+  width: 100%;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+tr {
+  box-shadow: rgba(0, 0, 0, 0.158) 0px 4px 2px -2px;
+}
+
+table img {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+}
+
+table td button {
+  border: none;
+  outline: none;
+  padding: 6px 12px;
+  background: aliceblue;
+  font-style: 14px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  border-radius: 4px;
+  transition: all 0.5s;
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+table td button:hover {
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  background: rgba(32, 218, 32, 0.151) !important;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.w-75 {
+  width: 75%;
+}
+
+.w-50 {
+  width: 49% !important;
+}
+
+.w-30 {
+  width: 32% !important;
+}
+
+.w-25 {
+  width: 24% !important;
+}

@@ -1,0 +1,88 @@
+.header {
+    width: 100%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    padding-top: 3px;
+    padding-bottom: 6px;
+    box-shadow: rgba(0, 0, 0, 0.338) 0px 3px 2px -2px;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 999;
+}
+
+.header .menu {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 40px;
+    height: 40px;
+    font-size: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header .user-option {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: absolute;
+    right: 8px;
+}
+
+.header .user-option img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+
+.header .user-option p {
+    font-size: 17px;
+}
+
+.user-option-body {
+    display: none;
+    width: auto;
+    height: auto;
+    padding: 16px;
+    position: absolute;
+    right: 10px;
+    top: 65px;
+    border-radius: 4px;
+    background-color: #4a4949;
+}
+
+.user-option-body::after {
+    content: "";
+    position: absolute;
+    right: 16px;
+    top: -10px;
+    width: 20px;
+    height: 20px;
+    background-color: #4a4949;
+    transform: rotate(45deg);
+}
+
+.user-option-body button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 120px;
+    height: auto;
+    padding: 8px;
+    border-radius: 4px;
+    border: none;
+    outline: none;
+    margin: 0 auto;
+    background-color: aliceblue;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+        rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+}
