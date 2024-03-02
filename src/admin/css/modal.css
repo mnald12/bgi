@@ -185,6 +185,10 @@
   gap: 10px;
 }
 
+.btn-flex button {
+  margin: 6px 0;
+}
+
 .del {
   color: red;
 }

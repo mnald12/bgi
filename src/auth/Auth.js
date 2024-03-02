@@ -13,7 +13,7 @@ const Auth = () => {
 
   const Selection = () => {
     return (
-      <div className="container">
+      <div className="container" id="container">
         <div className="selection">
           <div className="selection-left">
             <img src={logo} alt="logo" />
@@ -22,7 +22,13 @@ const Auth = () => {
             <h3>BGI Electrical</h3>
             <small>Store Management System</small>
             <p>Please Select your Role : </p>
-            <button className="admin-btn" onClick={() => setMode(2)}>
+            <button
+              className="admin-btn"
+              onClick={() => {
+                setMode(2);
+                document.getElementById("container").classList.add("");
+              }}
+            >
               <GrUserAdmin />
               Admin
             </button>
