@@ -48,12 +48,233 @@ const products = [
       sold: 901,
     },
   },
+  {
+    productName: "Aclara Electric Meter",
+    img: p1,
+    unit: "Piece",
+    data: {
+      price: 1450,
+      stocks: 231,
+      totalStocks: 534,
+      sold: 212,
+    },
+  },
+  {
+    productName: "OMNI Compact USB Extension Wire",
+    img: p2,
+    unit: "Piece",
+    data: {
+      price: 350,
+      stocks: 431,
+      totalStocks: 654,
+      sold: 412,
+    },
+  },
+  {
+    productName: "Firefly Hand Bulb",
+    img: p3,
+    unit: "Piece",
+    data: {
+      price: 150,
+      stocks: 683,
+      totalStocks: 2114,
+      sold: 817,
+    },
+  },
+  {
+    productName: "Firefly Rechargable Emergency Bulb",
+    img: p4,
+    unit: "Piece",
+    data: {
+      price: 250,
+      stocks: 231,
+      totalStocks: 1241,
+      sold: 901,
+    },
+  },
+  {
+    productName: "Aclara Electric Meter",
+    img: p1,
+    unit: "Piece",
+    data: {
+      price: 1450,
+      stocks: 231,
+      totalStocks: 534,
+      sold: 212,
+    },
+  },
+  {
+    productName: "OMNI Compact USB Extension Wire",
+    img: p2,
+    unit: "Piece",
+    data: {
+      price: 350,
+      stocks: 431,
+      totalStocks: 654,
+      sold: 412,
+    },
+  },
+  {
+    productName: "Firefly Hand Bulb",
+    img: p3,
+    unit: "Piece",
+    data: {
+      price: 150,
+      stocks: 683,
+      totalStocks: 2114,
+      sold: 817,
+    },
+  },
+  {
+    productName: "Firefly Rechargable Emergency Bulb",
+    img: p4,
+    unit: "Piece",
+    data: {
+      price: 250,
+      stocks: 231,
+      totalStocks: 1241,
+      sold: 901,
+    },
+  },
+  {
+    productName: "Aclara Electric Meter",
+    img: p1,
+    unit: "Piece",
+    data: {
+      price: 1450,
+      stocks: 231,
+      totalStocks: 534,
+      sold: 212,
+    },
+  },
+  {
+    productName: "OMNI Compact USB Extension Wire",
+    img: p2,
+    unit: "Piece",
+    data: {
+      price: 350,
+      stocks: 431,
+      totalStocks: 654,
+      sold: 412,
+    },
+  },
+  {
+    productName: "Firefly Hand Bulb",
+    img: p3,
+    unit: "Piece",
+    data: {
+      price: 150,
+      stocks: 683,
+      totalStocks: 2114,
+      sold: 817,
+    },
+  },
+  {
+    productName: "Firefly Rechargable Emergency Bulb",
+    img: p4,
+    unit: "Piece",
+    data: {
+      price: 250,
+      stocks: 231,
+      totalStocks: 1241,
+      sold: 901,
+    },
+  },
+  {
+    productName: "Aclara Electric Meter",
+    img: p1,
+    unit: "Piece",
+    data: {
+      price: 1450,
+      stocks: 231,
+      totalStocks: 534,
+      sold: 212,
+    },
+  },
+  {
+    productName: "OMNI Compact USB Extension Wire",
+    img: p2,
+    unit: "Piece",
+    data: {
+      price: 350,
+      stocks: 431,
+      totalStocks: 654,
+      sold: 412,
+    },
+  },
+  {
+    productName: "Firefly Hand Bulb",
+    img: p3,
+    unit: "Piece",
+    data: {
+      price: 150,
+      stocks: 683,
+      totalStocks: 2114,
+      sold: 817,
+    },
+  },
+  {
+    productName: "Firefly Rechargable Emergency Bulb",
+    img: p4,
+    unit: "Piece",
+    data: {
+      price: 250,
+      stocks: 231,
+      totalStocks: 1241,
+      sold: 901,
+    },
+  },
+  {
+    productName: "Aclara Electric Meter",
+    img: p1,
+    unit: "Piece",
+    data: {
+      price: 1450,
+      stocks: 231,
+      totalStocks: 534,
+      sold: 212,
+    },
+  },
+  {
+    productName: "OMNI Compact USB Extension Wire",
+    img: p2,
+    unit: "Piece",
+    data: {
+      price: 350,
+      stocks: 431,
+      totalStocks: 654,
+      sold: 412,
+    },
+  },
+  {
+    productName: "Firefly Hand Bulb",
+    img: p3,
+    unit: "Piece",
+    data: {
+      price: 150,
+      stocks: 683,
+      totalStocks: 2114,
+      sold: 817,
+    },
+  },
+  {
+    productName: "Firefly Rechargable Emergency Bulb",
+    img: p4,
+    unit: "Piece",
+    data: {
+      price: 250,
+      stocks: 231,
+      totalStocks: 1241,
+      sold: 901,
+    },
+  },
 ];
 
 const categories = [
   {
     name: "Pipes",
     sales: 12354,
+    products: 0,
   },
   {
     name: "Wires & Cables",

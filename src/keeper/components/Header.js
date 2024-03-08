@@ -40,7 +40,7 @@ const Header = () => {
       <button className="user-option" onClick={() => toglleOption()}>
         <div style={{ textAlign: "right" }}>
           <h4>Mariano Garapon</h4>
-          <small>Admin</small>
+          <small>Keeper</small>
         </div>
         <img alt="user" src={user} />
       </button>

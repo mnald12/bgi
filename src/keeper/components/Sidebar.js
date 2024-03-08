@@ -5,7 +5,6 @@ import { IoPerson } from "react-icons/io5";
 import { BsCalculatorFill, BsFillBoxFill } from "react-icons/bs";
 import { FaPesoSign } from "react-icons/fa6";
 import { TbHelpHexagonFilled } from "react-icons/tb";
-import { IoPricetags } from "react-icons/io5";
 import { useContext } from "react";
 import { SideData } from "../Keeper";
 
@@ -51,13 +50,6 @@ const Sidebar = () => {
         >
           <FaPesoSign className="icn" />
           Sales
-        </button>
-        <button
-          className={sideActive === "prices" ? "active" : ""}
-          onClick={() => setSideActive("prices")}
-        >
-          <IoPricetags className="icn" />
-          Prices
         </button>
         <div className="divider">
           <div className="line"></div>

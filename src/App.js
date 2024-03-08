@@ -1,7 +1,7 @@
 import { createContext, useState } from "react";
-import Auth from "./auth/Auth";
 import Admin from "./admin/Admin";
 import Keeper from "./keeper/Keeper";
+import Signin from "./auth/SIgnin";
 
 const Datas = createContext(null);
 
@@ -15,7 +15,7 @@ function App() {
         {isLogin ? (
           <div>{role === "admin" ? <Admin /> : <Keeper />}</div>
         ) : (
-          <Auth />
+          <Signin />
         )}
       </Datas.Provider>
     </div>

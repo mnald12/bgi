@@ -55,6 +55,7 @@
   justify-content: center;
   gap: 10px;
   max-width: 1600px;
+  overflow-x: hidden !important;
 }
 
 .contents {
@@ -63,6 +64,7 @@
   overflow: auto;
   padding-right: 6px;
   transition: 1s;
+  overflow-x: hidden !important;
 }
 
 button {
@@ -80,7 +82,9 @@ button {
 .page-header {
   display: flex;
   align-items: center;
-  position: relative;
+  position: sticky !important;
+  top: 49px;
+  background: white;
 }
 
 .page-header .search-bars {
@@ -128,6 +132,13 @@ table {
   width: 100%;
   margin-bottom: 10px;
   font-size: 15px;
+}
+
+th {
+  position: sticky;
+  top: 100px;
+  padding-bottom: 10px !important;
+  background-color: white;
 }
 
 th,
@@ -185,4 +196,23 @@ table td button:hover {
 
 .w-25 {
   width: 24% !important;
+}
+
+.dashboard,
+.categories,
+.products,
+.sales,
+.accounts,
+.settings,
+.help {
+  animation: slide 1s ease-in-out;
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }

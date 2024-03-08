@@ -1,5 +1,4 @@
 import "./auth.css";
-import logo from "../images/logo.png";
 import { useContext, useEffect, useState } from "react";
 import { GrUserAdmin } from "react-icons/gr";
 import { FaBuildingUser } from "react-icons/fa6";
@@ -16,7 +15,7 @@ const Auth = () => {
       <div className="container" id="container">
         <div className="selection">
           <div className="selection-left">
-            <img src={logo} alt="logo" />
+            <h3>Welcome</h3>
           </div>
           <div className="selection-right">
             <h3>BGI Electrical</h3>
@@ -26,7 +25,6 @@ const Auth = () => {
               className="admin-btn"
               onClick={() => {
                 setMode(2);
-                document.getElementById("container").classList.add("");
               }}
             >
               <GrUserAdmin />
