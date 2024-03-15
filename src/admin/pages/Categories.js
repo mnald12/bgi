@@ -15,7 +15,7 @@ import { db } from "../../db/config";
 import { IoWarningOutline } from "react-icons/io5";
 
 const Categories = () => {
-  const [categories, setCategories] = useState(null);
+  const [categories, setCategories] = useState([]);
   const [isLoaded, setIsloaded] = useState(false);
   const [catName, setCatName] = useState("");
   const [isModal, setIsModal] = useState(false);

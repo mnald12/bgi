@@ -28,7 +28,7 @@ const Products = () => {
   const [isLoaded, setIsloaded] = useState(false);
   const [isModal, setIsModal] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState({ mode: false, id: "" });
-  const [productss, setProductss] = useState([]);
+  const [products, setproducts] = useState([]);
   const [img, setImg] = useState(null);
   const [categories, setCategories] = useState(null);
 
@@ -39,7 +39,7 @@ const Products = () => {
       const prods = querySnapshot.docs.map((doc) => {
         return { id: doc.id, ...doc.data() };
       });
-      setProductss(prods);
+      setproducts(prods);
     };
     get();
 
@@ -174,7 +174,7 @@ const Products = () => {
         sold: 0,
       });
 
-      setProductss((prev) => [
+      setproducts((prev) => [
         ...prev,
         {
           id: newDoc.id,
@@ -228,7 +228,7 @@ const Products = () => {
           pcs: 0,
         },
       });
-      setProductss((prev) => [
+      setproducts((prev) => [
         ...prev,
         {
           id: newDoc.id,
@@ -295,7 +295,7 @@ const Products = () => {
           pcs: 0,
         },
       });
-      setProductss((prev) => [
+      setproducts((prev) => [
         ...prev,
         {
           id: newDoc.id,
@@ -362,7 +362,7 @@ const Products = () => {
           meter: 0,
         },
       });
-      setProductss((prev) => [
+      setproducts((prev) => [
         ...prev,
         {
           id: newDoc.id,
@@ -429,7 +429,7 @@ const Products = () => {
           pcs: 0,
         },
       });
-      setProductss((prev) => [
+      setproducts((prev) => [
         ...prev,
         {
           id: newDoc.id,
@@ -474,7 +474,7 @@ const Products = () => {
         income: 0,
         sold: 0,
       });
-      setProductss((prev) => [
+      setproducts((prev) => [
         ...prev,
         {
           id: newDoc.id,
@@ -528,7 +528,7 @@ const Products = () => {
           pcs: 0,
         },
       });
-      setProductss((prev) => [
+      setproducts((prev) => [
         ...prev,
         {
           id: newDoc.id,
@@ -576,7 +576,7 @@ const Products = () => {
 
   const deleteProd = async (id) => {
     setIsDeleteModal({ mode: false, id: "" });
-    setProductss((l) => l.filter((item) => item.id !== id));
+    setproducts((l) => l.filter((item) => item.id !== id));
     await deleteDoc(doc(db, "products", id));
   };
 
@@ -610,7 +610,7 @@ const Products = () => {
             </tr>
           </thead>
           <tbody id="tbody">
-            {productss.map((prod, id) => (
+            {products.map((prod, id) => (
               <tr key={id}>
                 <td>
                   <img src={prod.productImage} alt="prod" />
@@ -1249,10 +1249,10 @@ const Products = () => {
             <div className="text-center">
               <IoWarningOutline className="icn" />
             </div>
-            <h3>Are you sure to delete this product?</h3>
+            <h3>Are you sure you want to delete this product?</h3>
             <p>
-              This will delete this product permamently, You cannot undo this
-              action
+              This action will permanently remove the product, and it cannot be
+              undone.
             </p>
             <button
               className="dbtns delete"
