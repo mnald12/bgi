@@ -10,12 +10,14 @@ import Sales from "./pages/Sales";
 import Accounts from "./pages/Accounts";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
+import Product from "./pages/Product";
 Chart.register(...registerables);
 
 const SideData = createContext(null);
 
 const Admin = () => {
   const [sideActive, setSideActive] = useState("dashboard");
+  const [productId, setProductId] = useState(null);
 
   const Outlet = () => {
     if (sideActive === "dashboard") {
@@ -24,6 +26,8 @@ const Admin = () => {
       return <Categories />;
     } else if (sideActive === "products") {
       return <Products />;
+    } else if (sideActive === "product") {
+      return <Product />;
     } else if (sideActive === "sales") {
       return <Sales />;
     } else if (sideActive === "accounts") {
@@ -37,7 +41,9 @@ const Admin = () => {
 
   return (
     <div className="flex-container">
-      <SideData.Provider value={{ sideActive, setSideActive }}>
+      <SideData.Provider
+        value={{ sideActive, setSideActive, productId, setProductId }}
+      >
         <Sidebar />
         <div className="contents">
           <Header />

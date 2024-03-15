@@ -1,7 +1,7 @@
 import "../css/sidebar.css";
 import logo from "../images/logo.png";
 import { BiSolidDashboard } from "react-icons/bi";
-import { TbAdjustmentsCancel } from "react-icons/tb";
+// import { TbAdjustmentsCancel } from "react-icons/tb";
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { IoPerson } from "react-icons/io5";
 import { BsFillBoxFill } from "react-icons/bs";
@@ -65,12 +65,12 @@ const Sidebar = () => {
           <IoPerson className="icn" />
           Accounts
         </button>
-        <button
+        {/* <button
           className={sideActive === "settings" ? "active" : ""}
           onClick={() => setSideActive("settings")}
         >
           <TbAdjustmentsCancel className="icn" /> Settings
-        </button>
+        </button> */}
         <button
           className={sideActive === "help" ? "active" : ""}
           onClick={() => setSideActive("help")}

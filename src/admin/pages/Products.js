@@ -1,50 +1,63 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "../css/products.css";
 import "../css/modal.css";
 import logo from "../images/placeholder.png";
 import { RiCloseLine } from "react-icons/ri";
 import Loader from "../components/Loader";
-import { categories } from "../../datas";
 import { HiOutlineEye } from "react-icons/hi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { BiSolidEdit } from "react-icons/bi";
+import { IoWarningOutline } from "react-icons/io5";
 import {
   collection,
   doc,
-  setDoc,
   query,
   getDocs,
   deleteDoc,
+  addDoc,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../../db/config";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../../db/config";
-import { v4 } from "uuid";
+import { SideData } from "../Admin";
+import { cryptoRandomStringAsync } from "crypto-random-string";
 
 const Products = () => {
+  const { setSideActive, setProductId } = useContext(SideData);
   const [isLoaded, setIsloaded] = useState(false);
   const [isModal, setIsModal] = useState(false);
+  const [isDeleteModal, setIsDeleteModal] = useState({ mode: false, id: "" });
   const [productss, setProductss] = useState([]);
   const [img, setImg] = useState(null);
+  const [categories, setCategories] = useState(null);
 
   useEffect(() => {
+    const get = async () => {
+      const q = query(collection(db, "products"), orderBy("productName"));
+      const querySnapshot = await getDocs(q);
+      const prods = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+      setProductss(prods);
+    };
+    get();
+
+    const getCat = async () => {
+      const q = query(collection(db, "categories"), orderBy("name"));
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot) {
+        const cats = querySnapshot.docs.map((doc) => {
+          return { id: doc.id, ...doc.data() };
+        });
+        setCategories(cats);
+      }
+    };
+    getCat();
+
     setTimeout(() => {
       setIsloaded(true);
     }, 1000);
-
-    const get = async () => {
-      const ps = [];
-      const q = query(collection(db, "products"));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        const obj = doc.data();
-        obj.id = doc.id;
-        ps.push(obj);
-        setProductss(ps);
-      });
-    };
-
-    get();
   }, []);
 
   const units = ["Piece", "Pack", "Box", "Roll", "Set", "Pair", "Bundle"];
@@ -60,9 +73,8 @@ const Products = () => {
   };
 
   const [activeUnit, setActiveUnit] = useState("Piece");
-
   const [pname, setPname] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("Pipes");
 
   //pcs
   const [qtyPcs, setQtyPcs] = useState(0);
@@ -115,13 +127,24 @@ const Products = () => {
   const [spBundlePcs, setSpBundlePcs] = useState(0);
 
   const uploadImage = () => {
+    if (pname === "") {
+      document.getElementById("noname").classList.remove("d-none");
+      setTimeout(() => {
+        document.getElementById("noname").classList.add("d-none");
+      }, 2000);
+      return;
+    }
+
     const imgz = document.getElementById("imgs");
     if (imgz.files.length <= 0) {
       addProduct(
         "https://firebasestorage.googleapis.com/v0/b/bgi-electrical.appspot.com/o/images%2Fplaceholder.png?alt=media&token=8b29243a-cade-49e8-b231-43a1a999cbf9"
       );
     } else {
-      const imageRef = ref(storage, `images/${img.name + v4()}`);
+      const imageRef = ref(
+        storage,
+        `images/${img.name + cryptoRandomStringAsync({ length: 10 })}`
+      );
       uploadBytes(imageRef, img).then((snapshot) => {
         getDownloadURL(snapshot.ref).then((url) => {
           addProduct(url);
@@ -136,22 +159,25 @@ const Products = () => {
 
     if (activeUnit === unit.piece) {
       const tc = capitalPcs * qtyPcs;
-      await setDoc(doc(productRef), {
+
+      const newDoc = await addDoc(productRef, {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
         category: category,
-        totalStocks: qtyPcs,
-        stocks: qtyPcs,
-        capital: capitalPcs,
-        totalCapital: tc,
-        price: pcsSpPcs,
+        totalStocks: +qtyPcs,
+        stocks: +qtyPcs,
+        capital: +capitalPcs,
+        totalCapital: +tc,
+        price: +pcsSpPcs,
         income: 0,
         sold: 0,
       });
+
       setProductss((prev) => [
         ...prev,
         {
+          id: newDoc.id,
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
@@ -176,25 +202,25 @@ const Products = () => {
         tc = capitalPack * qtyPack;
       }
 
-      await setDoc(doc(productRef), {
+      const newDoc = await addDoc(productRef, {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
         category: category,
         totalStocks: {
-          pack: qtyPack,
-          pcs: packQtyPcs,
+          pack: +qtyPack,
+          pcs: +packQtyPcs,
         },
         stocks: {
-          pack: qtyPack,
-          pcs: packQtyPcs,
+          pack: +qtyPack,
+          pcs: +packQtyPcs,
         },
-        pcsPerPack: pcsPerPack,
-        capital: capitalPack,
-        totalCapital: tc,
+        pcsPerPack: +pcsPerPack,
+        capital: +capitalPack,
+        totalCapital: +tc,
         price: {
-          pack: spPack,
-          pcs: spPackPcs,
+          pack: +spPack,
+          pcs: +spPackPcs,
         },
         income: 0,
         sold: {
@@ -205,6 +231,7 @@ const Products = () => {
       setProductss((prev) => [
         ...prev,
         {
+          id: newDoc.id,
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
@@ -242,57 +269,58 @@ const Products = () => {
         tc = capitalBox * qtyBox;
       }
 
-      await setDoc(doc(productRef), {
+      const newDoc = await addDoc(productRef, {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
         category: category,
         totalStocks: {
-          box: qtyBox,
-          pcs: pcsPerBox,
+          box: +qtyBox,
+          pcs: +pcsPerBox,
         },
         stocks: {
-          pack: qtyBox,
-          pcs: pcsPerBox,
+          box: +qtyBox,
+          pcs: +pcsPerBox,
         },
-        pcsPerBox: pcsPerBox,
-        capital: capitalPack,
-        totalCapital: tc,
+        pcsPerBox: +pcsPerBox,
+        capital: +capitalBox,
+        totalCapital: +tc,
         price: {
-          pack: spPack,
-          pcs: spPackPcs,
+          box: +spBox,
+          pcs: +spBoxPcs,
         },
         income: 0,
         sold: {
-          pack: 0,
+          box: 0,
           pcs: 0,
         },
       });
       setProductss((prev) => [
         ...prev,
         {
+          id: newDoc.id,
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
           category: category,
           totalStocks: {
-            box: qtyBox,
-            pcs: pcsPerBox,
+            box: +qtyBox,
+            pcs: +pcsPerBox,
           },
           stocks: {
-            pack: qtyBox,
-            pcs: pcsPerBox,
+            box: +qtyBox,
+            pcs: +pcsPerBox,
           },
-          pcsPerBox: pcsPerBox,
-          capital: capitalPack,
-          totalCapital: tc,
+          pcsPerBox: +pcsPerBox,
+          capital: +capitalBox,
+          totalCapital: +tc,
           price: {
-            pack: spPack,
-            pcs: spPackPcs,
+            box: +spBox,
+            pcs: +spBoxPcs,
           },
           income: 0,
           sold: {
-            pack: 0,
+            box: 0,
             pcs: 0,
           },
         },
@@ -308,25 +336,25 @@ const Products = () => {
         tc = capitalRoll * qtyRoll;
       }
 
-      await setDoc(doc(productRef), {
+      const newDoc = await addDoc(productRef, {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
         category: category,
         totalStocks: {
-          roll: qtyRoll,
-          meter: qtyMeter,
+          roll: +qtyRoll,
+          meter: +qtyMeter,
         },
         stocks: {
-          roll: qtyRoll,
-          meter: qtyMeter,
+          roll: +qtyRoll,
+          meter: +qtyMeter,
         },
-        meterPerRoll: meterPerRoll,
-        capital: capitalRoll,
-        totalCapital: tc,
+        meterPerRoll: +meterPerRoll,
+        capital: +capitalRoll,
+        totalCapital: +tc,
         price: {
-          roll: spRoll,
-          meter: spMeter,
+          roll: +spRoll,
+          meter: +spMeter,
         },
         income: 0,
         sold: {
@@ -337,6 +365,7 @@ const Products = () => {
       setProductss((prev) => [
         ...prev,
         {
+          id: newDoc.id,
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
@@ -374,25 +403,25 @@ const Products = () => {
         tc = capitalSet * qtySet;
       }
 
-      await setDoc(doc(productRef), {
+      const newDoc = await addDoc(productRef, {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
         category: category,
         totalStocks: {
-          set: qtySet,
-          pcs: qtySetPcs,
+          set: +qtySet,
+          pcs: +qtySetPcs,
         },
         stocks: {
-          set: qtySet,
-          pcs: qtySetPcs,
+          set: +qtySet,
+          pcs: +qtySetPcs,
         },
-        pcsPerSet: pcsPerSet,
-        capital: capitalSet,
+        pcsPerSet: +pcsPerSet,
+        capital: +capitalSet,
         totalCapital: tc,
         price: {
-          set: spSet,
-          pcs: spSetPcs,
+          set: +spSet,
+          pcs: +spSetPcs,
         },
         income: 0,
         sold: {
@@ -403,6 +432,7 @@ const Products = () => {
       setProductss((prev) => [
         ...prev,
         {
+          id: newDoc.id,
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
@@ -431,19 +461,36 @@ const Products = () => {
       ]);
     } else if (activeUnit === unit.pair) {
       const tc = capitalPair * qtyPair;
-      await setDoc(doc(productRef), {
+      const newDoc = await addDoc(productRef, {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
         category: category,
-        totalStocks: qtyPair,
-        stocks: qtyPair,
-        capital: capitalPair,
-        totalCapital: tc,
-        price: spPair,
+        totalStocks: +qtyPair,
+        stocks: +qtyPair,
+        capital: +capitalPair,
+        totalCapital: +tc,
+        price: +spPair,
         income: 0,
         sold: 0,
       });
+      setProductss((prev) => [
+        ...prev,
+        {
+          id: newDoc.id,
+          productImage: imgUrl,
+          productName: pname,
+          unit: activeUnit,
+          category: category,
+          totalStocks: qtyPair,
+          stocks: qtyPair,
+          capital: capitalPair,
+          totalCapital: tc,
+          price: spPair,
+          income: 0,
+          sold: 0,
+        },
+      ]);
     } else if (activeUnit === unit.bundle) {
       let tc = 0;
 
@@ -455,25 +502,25 @@ const Products = () => {
         tc = capitalBundle * qtyBundle;
       }
 
-      await setDoc(doc(productRef), {
+      const newDoc = await addDoc(productRef, {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
         category: category,
         totalStocks: {
-          bundle: qtyBundle,
-          pcs: qtyBundlePcs,
+          bundle: +qtyBundle,
+          pcs: +qtyBundlePcs,
         },
         stocks: {
-          bundle: qtyBundle,
-          pcs: qtyBundlePcs,
+          bundle: +qtyBundle,
+          pcs: +qtyBundlePcs,
         },
-        pcsPerBundle: pcsPerBundle,
-        capital: capitalBundle,
-        totalCapital: tc,
+        pcsPerBundle: +pcsPerBundle,
+        capital: +capitalBundle,
+        totalCapital: +tc,
         price: {
-          bundle: spBundle,
-          pcs: spBundlePcs,
+          bundle: +spBundle,
+          pcs: +spBundlePcs,
         },
         income: 0,
         sold: {
@@ -484,6 +531,7 @@ const Products = () => {
       setProductss((prev) => [
         ...prev,
         {
+          id: newDoc.id,
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
@@ -527,6 +575,7 @@ const Products = () => {
   };
 
   const deleteProd = async (id) => {
+    setIsDeleteModal({ mode: false, id: "" });
     setProductss((l) => l.filter((item) => item.id !== id));
     await deleteDoc(doc(db, "products", id));
   };
@@ -538,10 +587,11 @@ const Products = () => {
           <h3 className="page-title">Products</h3>
           <div className="search-bars">
             <input
-              id="search-field"
+              id="searchs"
               type="search"
               placeholder="Search products here..."
               onKeyUp={(e) => searchTable(e)}
+              onChange={(e) => searchTable(e)}
             />
             <button className="add-bar" onClick={() => setIsModal(true)}>
               Add product
@@ -710,7 +760,14 @@ const Products = () => {
                   <td>{prod.stocks} Pcs</td>
                 )}
                 <td className="btn-flex">
-                  <button className="view" title="view">
+                  <button
+                    className="view"
+                    title="view"
+                    onClick={() => {
+                      setSideActive("product");
+                      setProductId(prod.id);
+                    }}
+                  >
                     <HiOutlineEye />
                   </button>
                   <button className="upd" title="edit">
@@ -719,7 +776,9 @@ const Products = () => {
                   <button
                     className="del"
                     title="delete"
-                    onClick={() => deleteProd(prod.id)}
+                    onClick={() =>
+                      setIsDeleteModal({ mode: true, id: prod.id })
+                    }
                   >
                     <RiDeleteBin6Line />
                   </button>
@@ -753,8 +812,16 @@ const Products = () => {
                 </div>
                 <div className="modal-right">
                   <div className="input-group w-100">
+                    <p
+                      id="noname"
+                      className="d-none color-red"
+                      style={{ paddingBottom: "10px" }}
+                    >
+                      The product name cannot be left empty
+                    </p>
                     <label>Product Name</label>
                     <input
+                      id="prod-name"
                       type="text"
                       value={pname}
                       onChange={(e) => setPname(e.target.value)}
@@ -1169,6 +1236,36 @@ const Products = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+        <div className={isDeleteModal.mode ? "modal d-flex" : "modal d-none"}>
+          <div className="modal-body-delete">
+            <button
+              className="modal-close"
+              onClick={() => setIsDeleteModal(false)}
+            >
+              <RiCloseLine />
+            </button>
+            <div className="text-center">
+              <IoWarningOutline className="icn" />
+            </div>
+            <h3>Are you sure to delete this product?</h3>
+            <p>
+              This will delete this product permamently, You cannot undo this
+              action
+            </p>
+            <button
+              className="dbtns delete"
+              onClick={() => deleteProd(isDeleteModal.id)}
+            >
+              Delete
+            </button>
+            <button
+              className="dbtns cancel"
+              onClick={() => setIsDeleteModal({ mode: false, id: "" })}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>

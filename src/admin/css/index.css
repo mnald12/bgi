@@ -126,6 +126,48 @@ button {
     rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
   border-radius: 5px;
   white-space: nowrap !important;
+  transition: 0.5s;
+}
+.add-bar:hover {
+  background: rgba(34, 139, 34, 0.895);
+}
+.prod-restock {
+  width: auto;
+  border: none;
+  outline: none;
+  background: rgba(34, 139, 34, 0.938);
+  color: white;
+  padding: 10px 16px;
+  box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em,
+    rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+  border-radius: 5px;
+  white-space: nowrap !important;
+}
+
+.prod-update {
+  width: auto;
+  border: none;
+  outline: none;
+  background: rgb(224, 148, 5);
+  color: white;
+  padding: 10px 16px;
+  box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em,
+    rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+  border-radius: 5px;
+  white-space: nowrap !important;
+}
+
+.prod-delete {
+  width: auto;
+  border: none;
+  outline: none;
+  background: rgba(255, 0, 0, 0.959);
+  color: white;
+  padding: 10px 16px;
+  box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em,
+    rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+  border-radius: 5px;
+  white-space: nowrap !important;
 }
 
 table {
@@ -198,7 +240,7 @@ table td button:hover {
   width: 24% !important;
 }
 
-.dashboard,
+/* .dashboard,
 .categories,
 .products,
 .sales,
@@ -215,4 +257,4 @@ table td button:hover {
   to {
     transform: translateX(0);
   }
-}
+} */
