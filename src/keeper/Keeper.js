@@ -6,6 +6,7 @@ import Header from "./components/Header";
 import Dashboard from "./pages/Dashboard";
 import Counter from "./pages/Counter";
 import Products from "./pages/Products";
+import Sales from "./pages/Sales";
 Chart.register(...registerables);
 
 const SideData = createContext(null);
@@ -20,6 +21,8 @@ const Keeper = () => {
       return <Counter />;
     } else if (sideActive === "products") {
       return <Products />;
+    } else if (sideActive === "sales") {
+      return <Sales />;
     }
   };
 

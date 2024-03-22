@@ -30,7 +30,9 @@ const Products = () => {
   const [isDeleteModal, setIsDeleteModal] = useState({ mode: false, id: "" });
   const [products, setproducts] = useState([]);
   const [img, setImg] = useState(null);
-  const [categories, setCategories] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryId, setCategoryId] = useState("");
 
   useEffect(() => {
     const get = async () => {
@@ -46,12 +48,12 @@ const Products = () => {
     const getCat = async () => {
       const q = query(collection(db, "categories"), orderBy("name"));
       const querySnapshot = await getDocs(q);
-      if (querySnapshot) {
-        const cats = querySnapshot.docs.map((doc) => {
-          return { id: doc.id, ...doc.data() };
-        });
-        setCategories(cats);
-      }
+      const cats = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+      setCategories(cats);
+      setCategoryId(cats[0].id);
+      setCategoryName(cats[0].name);
     };
     getCat();
 
@@ -74,7 +76,6 @@ const Products = () => {
 
   const [activeUnit, setActiveUnit] = useState("Piece");
   const [pname, setPname] = useState("");
-  const [category, setCategory] = useState("Pipes");
 
   //pcs
   const [qtyPcs, setQtyPcs] = useState(0);
@@ -164,7 +165,9 @@ const Products = () => {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
-        category: category,
+        category: categoryName,
+        categoryId: categoryId,
+        isArchived: false,
         totalStocks: +qtyPcs,
         stocks: +qtyPcs,
         capital: +capitalPcs,
@@ -172,6 +175,7 @@ const Products = () => {
         price: +pcsSpPcs,
         income: 0,
         sold: 0,
+        sales: 0,
       });
 
       setproducts((prev) => [
@@ -181,7 +185,9 @@ const Products = () => {
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
-          category: category,
+          category: categoryName,
+          categoryId: categoryId,
+          isArchived: false,
           totalStocks: qtyPcs,
           stocks: qtyPcs,
           capital: capitalPcs,
@@ -189,6 +195,7 @@ const Products = () => {
           price: pcsSpPcs,
           income: 0,
           sold: 0,
+          sales: 0,
         },
       ]);
     } else if (activeUnit === unit.pack) {
@@ -206,7 +213,9 @@ const Products = () => {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
-        category: category,
+        category: categoryName,
+        categoryId: categoryId,
+        isArchived: false,
         totalStocks: {
           pack: +qtyPack,
           pcs: +packQtyPcs,
@@ -227,6 +236,7 @@ const Products = () => {
           pack: 0,
           pcs: 0,
         },
+        sales: 0,
       });
       setproducts((prev) => [
         ...prev,
@@ -235,7 +245,9 @@ const Products = () => {
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
-          category: category,
+          category: categoryName,
+          categoryId: categoryId,
+          isArchived: false,
           totalStocks: {
             pack: qtyPack,
             pcs: packQtyPcs,
@@ -256,6 +268,7 @@ const Products = () => {
             pack: 0,
             pcs: 0,
           },
+          sales: 0,
         },
       ]);
     } else if (activeUnit === unit.box) {
@@ -273,14 +286,16 @@ const Products = () => {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
-        category: category,
+        category: categoryName,
+        categoryId: categoryId,
+        isArchived: false,
         totalStocks: {
           box: +qtyBox,
-          pcs: +pcsPerBox,
+          pcs: +boxQtyPcs,
         },
         stocks: {
           box: +qtyBox,
-          pcs: +pcsPerBox,
+          pcs: +boxQtyPcs,
         },
         pcsPerBox: +pcsPerBox,
         capital: +capitalBox,
@@ -294,6 +309,7 @@ const Products = () => {
           box: 0,
           pcs: 0,
         },
+        sales: 0,
       });
       setproducts((prev) => [
         ...prev,
@@ -302,14 +318,16 @@ const Products = () => {
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
-          category: category,
+          category: categoryName,
+          categoryId: categoryId,
+          isArchived: false,
           totalStocks: {
             box: +qtyBox,
-            pcs: +pcsPerBox,
+            pcs: +boxQtyPcs,
           },
           stocks: {
             box: +qtyBox,
-            pcs: +pcsPerBox,
+            pcs: +boxQtyPcs,
           },
           pcsPerBox: +pcsPerBox,
           capital: +capitalBox,
@@ -323,6 +341,7 @@ const Products = () => {
             box: 0,
             pcs: 0,
           },
+          sales: 0,
         },
       ]);
     } else if (activeUnit === unit.roll) {
@@ -340,7 +359,9 @@ const Products = () => {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
-        category: category,
+        category: categoryName,
+        categoryId: categoryId,
+        isArchived: false,
         totalStocks: {
           roll: +qtyRoll,
           meter: +qtyMeter,
@@ -361,6 +382,7 @@ const Products = () => {
           roll: 0,
           meter: 0,
         },
+        sales: 0,
       });
       setproducts((prev) => [
         ...prev,
@@ -369,7 +391,9 @@ const Products = () => {
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
-          category: category,
+          category: categoryName,
+          categoryId: categoryId,
+          isArchived: false,
           totalStocks: {
             roll: qtyRoll,
             meter: qtyMeter,
@@ -390,6 +414,7 @@ const Products = () => {
             roll: 0,
             meter: 0,
           },
+          sales: 0,
         },
       ]);
     } else if (activeUnit === unit.set) {
@@ -407,7 +432,9 @@ const Products = () => {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
-        category: category,
+        category: categoryName,
+        categoryId: categoryId,
+        isArchived: false,
         totalStocks: {
           set: +qtySet,
           pcs: +qtySetPcs,
@@ -428,6 +455,7 @@ const Products = () => {
           set: 0,
           pcs: 0,
         },
+        sales: 0,
       });
       setproducts((prev) => [
         ...prev,
@@ -436,7 +464,9 @@ const Products = () => {
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
-          category: category,
+          category: categoryName,
+          categoryId: categoryId,
+          isArchived: false,
           totalStocks: {
             set: qtySet,
             pcs: qtySetPcs,
@@ -457,6 +487,7 @@ const Products = () => {
             set: 0,
             pcs: 0,
           },
+          sales: 0,
         },
       ]);
     } else if (activeUnit === unit.pair) {
@@ -465,7 +496,9 @@ const Products = () => {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
-        category: category,
+        category: categoryName,
+        categoryId: categoryId,
+        isArchived: false,
         totalStocks: +qtyPair,
         stocks: +qtyPair,
         capital: +capitalPair,
@@ -481,7 +514,9 @@ const Products = () => {
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
-          category: category,
+          category: categoryName,
+          categoryId: categoryId,
+          isArchived: false,
           totalStocks: qtyPair,
           stocks: qtyPair,
           capital: capitalPair,
@@ -489,6 +524,7 @@ const Products = () => {
           price: spPair,
           income: 0,
           sold: 0,
+          sales: 0,
         },
       ]);
     } else if (activeUnit === unit.bundle) {
@@ -506,7 +542,9 @@ const Products = () => {
         productImage: imgUrl,
         productName: pname,
         unit: activeUnit,
-        category: category,
+        category: categoryName,
+        categoryId: categoryId,
+        isArchived: false,
         totalStocks: {
           bundle: +qtyBundle,
           pcs: +qtyBundlePcs,
@@ -527,6 +565,7 @@ const Products = () => {
           bundle: 0,
           pcs: 0,
         },
+        sales: 0,
       });
       setproducts((prev) => [
         ...prev,
@@ -535,7 +574,9 @@ const Products = () => {
           productImage: imgUrl,
           productName: pname,
           unit: activeUnit,
-          category: category,
+          category: categoryName,
+          categoryId: categoryId,
+          isArchived: false,
           totalStocks: {
             bundle: qtyBundle,
             pcs: qtyBundlePcs,
@@ -556,6 +597,7 @@ const Products = () => {
             bundle: 0,
             pcs: 0,
           },
+          sales: 0,
         },
       ]);
     }
@@ -578,6 +620,12 @@ const Products = () => {
     setIsDeleteModal({ mode: false, id: "" });
     setproducts((l) => l.filter((item) => item.id !== id));
     await deleteDoc(doc(db, "products", id));
+  };
+
+  const handleSelectChange = (val) => {
+    const cat = JSON.parse(val);
+    setCategoryId(cat.id);
+    setCategoryName(cat.name);
   };
 
   if (isLoaded) {
@@ -611,7 +659,7 @@ const Products = () => {
           </thead>
           <tbody id="tbody">
             {products.map((prod, id) => (
-              <tr key={id}>
+              <tr key={id} className={prod.isArchived ? "d-none" : ""}>
                 <td>
                   <img src={prod.productImage} alt="prod" />
                 </td>
@@ -829,9 +877,15 @@ const Products = () => {
                   </div>
                   <div className="input-group w-50">
                     <label>Category</label>
-                    <select onChange={(e) => setCategory(e.target.value)}>
+                    <select
+                      onChange={(e) => {
+                        handleSelectChange(e.target.value);
+                      }}
+                    >
                       {categories.map((c, id) => (
-                        <option key={id}>{c.name}</option>
+                        <option value={JSON.stringify(c)} key={id}>
+                          {c.name}
+                        </option>
                       ))}
                     </select>
                   </div>

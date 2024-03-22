@@ -23,3 +23,16 @@ button {
 .text-right {
   text-align: right;
 }
+
+.bg-green {
+  background-color: forestgreen;
+  color: aliceblue;
+}
+
+.w-300px {
+  width: 260px !important;
+}
+
+.mt-2 {
+  margin-top: 10px !important;
+}
