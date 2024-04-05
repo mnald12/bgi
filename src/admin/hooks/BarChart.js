@@ -1,26 +1,50 @@
-import React from "react";
 import { Bar } from "react-chartjs-2";
-import { categories } from "../../datas";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { db } from "../../db/config";
 
-const labelsValue = [];
-const dataValue = [];
+const mapLabel = (arr) => {
+  const newArray = [];
 
-for (let i of categories) {
-  labelsValue.push(i.name);
-  dataValue.push(i.sales);
-}
+  for (let i of arr) {
+    newArray.push(i.name);
+  }
 
-const data = {
-  labels: labelsValue,
-  datasets: [
-    {
-      label: "Sales",
-      data: dataValue,
-      backgroundColor: "midnightblue", // Customize bar color
-    },
-    // Add more datasets as needed
-  ],
+  return newArray;
 };
+
+const mapSale = (arr) => {
+  const newArray = [];
+
+  for (let i of arr) {
+    newArray.push(i.sales);
+  }
+
+  return newArray;
+};
+
+let data;
+
+const get = async () => {
+  const q = query(collection(db, "categories"), orderBy("name"));
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot) {
+    const cats = querySnapshot.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() };
+    });
+    data = {
+      labels: mapLabel(cats),
+      datasets: [
+        {
+          label: "Sales",
+          data: mapSale(cats),
+          backgroundColor: "midnightblue",
+        },
+      ],
+    };
+  }
+};
+
+get();
 
 const BarChart = () => {
   return (

@@ -72,7 +72,7 @@
 .product-lists button {
   width: 95%;
   height: auto;
-  padding: 4px;
+  padding: 6px;
   margin-top: 10px;
   margin-left: 5px;
   text-align: left;
@@ -84,7 +84,7 @@
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
     rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
   border-radius: 4px;
-  background-color: whitesmoke;
+  background-color: white;
 }
 
 .product-lists button img {
@@ -325,4 +325,90 @@
   position: absolute;
   top: 24px;
   left: 0;
+}
+
+.tfoot tr {
+  box-shadow: unset !important;
+  padding: 0 !important;
+}
+
+.drafts {
+  width: 98%;
+  margin-left: 1%;
+  padding: 20px;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+  border-radius: 16px;
+  margin-top: 10px;
+}
+
+.draftt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: calc(100% - 30px);
+}
+
+.drafts .draft {
+  width: 100%;
+  background: aliceblue;
+  padding: 8px;
+  border-radius: 6px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+  border: none;
+  outline: none;
+}
+
+.draft h3 {
+  margin-left: 6px;
+  font-weight: 500;
+}
+
+.draft p {
+  position: absolute;
+  right: 6px;
+}
+
+.deldraft {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 20px;
+  position: absolute;
+  right: -30px;
+  transform: translateY(8px);
+  z-index: 3;
+}
+
+.par {
+  padding: 12px !important;
+}
+
+.trss td {
+  padding-bottom: 2px !important;
+}
+
+.trs td {
+  padding: 4px 10px !important;
+}
+
+.counter-footer {
+  width: 98%;
+  position: sticky;
+  bottom: 0;
+  padding: 12px;
+  background: blue;
+}
+
+.tb2 {
+  transform: translateY(-10px);
+}
+
+.tb2 th {
+  position: sticky !important;
+  top: 0 !important;
 }

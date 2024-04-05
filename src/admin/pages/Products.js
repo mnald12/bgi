@@ -5,17 +5,17 @@ import logo from "../images/placeholder.png";
 import { RiCloseLine } from "react-icons/ri";
 import Loader from "../components/Loader";
 import { HiOutlineEye } from "react-icons/hi";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import { BiSolidEdit } from "react-icons/bi";
 import { IoWarningOutline } from "react-icons/io5";
+import { IoArchive } from "react-icons/io5";
 import {
   collection,
   doc,
   query,
   getDocs,
-  deleteDoc,
   addDoc,
   orderBy,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../db/config";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -27,9 +27,11 @@ const Products = () => {
   const { setSideActive, setProductId } = useContext(SideData);
   const [isLoaded, setIsloaded] = useState(false);
   const [isModal, setIsModal] = useState(false);
+  const [isUpModal, setIsUpModal] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState({ mode: false, id: "" });
   const [products, setproducts] = useState([]);
   const [img, setImg] = useState(null);
+  const [img2, setImg2] = useState(null);
   const [categories, setCategories] = useState([]);
   const [categoryName, setCategoryName] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -126,6 +128,41 @@ const Products = () => {
   const [capitalBundle, setCapitalBundle] = useState(0);
   const [spBundle, setSpBundle] = useState(0);
   const [spBundlePcs, setSpBundlePcs] = useState(0);
+
+  //update prod
+
+  const [prodToBeUpdated, setProdToBeUpdated] = useState(null);
+
+  const [upImg, setUpImg] = useState(null);
+  const [upPname, setUpPname] = useState("");
+  const [upUnit, setUpUnit] = useState("");
+  const [upCat, setUpCat] = useState("");
+
+  //pcs
+  const [upSpPcs, setUpSpPcs] = useState(0);
+
+  //pack
+  const [upSpPack, setUpSpPack] = useState(0);
+  const [upSpPackPcs, setUpSpPackPcs] = useState(0);
+
+  //box
+  const [upSpBox, setUpSpBox] = useState(0);
+  const [upSpBoxPcs, setUpSpBoxPcs] = useState(0);
+
+  //roll
+  const [upSpRoll, setUpSpRoll] = useState(0);
+  const [upSpMeter, setUpSpMeter] = useState(0);
+
+  //set
+  const [upSpSet, setUpSpSet] = useState(0);
+  const [upSpSetPcs, setUpSpSetPcs] = useState(0);
+
+  //pair
+  const [upSpPair, setUpSpPair] = useState(0);
+
+  //bundle
+  const [upSpBundle, setUpSpBundle] = useState(0);
+  const [upSpBundlePcs, setUpSpBundlePcs] = useState(0);
 
   const uploadImage = () => {
     if (pname === "") {
@@ -606,6 +643,159 @@ const Products = () => {
     setIsModal(false);
   };
 
+  const updateProduct = async () => {
+    setIsloaded(false);
+
+    const uimgz = document.getElementById("uimgs");
+
+    if (uimgz.files.length > 0) {
+      console.log("yes");
+      const imageRef = ref(
+        storage,
+        `images/${img2.name + cryptoRandomStringAsync({ length: 10 })}23`
+      );
+      uploadBytes(imageRef, img2).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then(async (url) => {
+          if (upUnit === unit.piece) {
+            await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+              productImage: url,
+              productName: upPname,
+              category: upCat,
+              price: upSpPcs,
+            });
+          } else if (upUnit === unit.pack) {
+            await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+              productImage: url,
+              productName: upPname,
+              category: upCat,
+              price: {
+                pack: upSpPack,
+                pcs: upSpPackPcs,
+              },
+            });
+          } else if (upUnit === unit.box) {
+            await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+              productImage: url,
+              productName: upPname,
+              category: upCat,
+              price: {
+                box: upSpBox,
+                pcs: upSpBoxPcs,
+              },
+            });
+          } else if (upUnit === unit.roll) {
+            await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+              productImage: url,
+              productName: upPname,
+              category: upCat,
+              price: {
+                roll: upSpRoll,
+                meter: upSpMeter,
+              },
+            });
+          } else if (upUnit === unit.set) {
+            await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+              productImage: url,
+              productName: upPname,
+              category: upCat,
+              price: {
+                set: upSpSet,
+                pcs: upSpSetPcs,
+              },
+            });
+          } else if (upUnit === unit.pair) {
+            await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+              productImage: url,
+              productName: upPname,
+              category: upCat,
+              price: upSpPair,
+            });
+          } else if (upUnit === unit.bundle) {
+            await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+              productImage: url,
+              productName: upPname,
+              category: upCat,
+              price: {
+                bundle: upSpBundle,
+                pcs: upSpBundlePcs,
+              },
+            });
+          }
+        });
+      });
+    } else {
+      if (upUnit === unit.piece) {
+        await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+          productName: upPname,
+          category: upCat,
+          price: upSpPcs,
+        });
+      } else if (upUnit === unit.pack) {
+        await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+          productName: upPname,
+          category: upCat,
+          price: {
+            pack: upSpPack,
+            pcs: upSpPackPcs,
+          },
+        });
+      } else if (upUnit === unit.box) {
+        await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+          productName: upPname,
+          category: upCat,
+          price: {
+            box: upSpBox,
+            pcs: upSpBoxPcs,
+          },
+        });
+      } else if (upUnit === unit.roll) {
+        await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+          productName: upPname,
+          category: upCat,
+          price: {
+            roll: upSpRoll,
+            meter: upSpMeter,
+          },
+        });
+      } else if (upUnit === unit.set) {
+        await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+          productName: upPname,
+          category: upCat,
+          price: {
+            set: upSpSet,
+            pcs: upSpSetPcs,
+          },
+        });
+      } else if (upUnit === unit.pair) {
+        await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+          productName: upPname,
+          category: upCat,
+          price: upSpPair,
+        });
+      } else if (upUnit === unit.bundle) {
+        await updateDoc(doc(db, "products", prodToBeUpdated.id), {
+          productName: upPname,
+          category: upCat,
+          price: {
+            bundle: upSpBundle,
+            pcs: upSpBundlePcs,
+          },
+        });
+      }
+    }
+
+    const q = query(collection(db, "products"), orderBy("productName"));
+    const querySnapshot = await getDocs(q);
+    const prods = querySnapshot.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() };
+    });
+
+    setproducts(prods);
+    setIsUpModal(false);
+
+    setIsloaded(true);
+  };
+
   const searchTable = (e) => {
     const lists = document.getElementById("tbody").querySelectorAll("tr");
     const textToSearch = e.target.value.toUpperCase();
@@ -619,13 +809,20 @@ const Products = () => {
   const deleteProd = async (id) => {
     setIsDeleteModal({ mode: false, id: "" });
     setproducts((l) => l.filter((item) => item.id !== id));
-    await deleteDoc(doc(db, "products", id));
+    await updateDoc(doc(db, "products", id), {
+      isArchived: true,
+    });
   };
 
   const handleSelectChange = (val) => {
     const cat = JSON.parse(val);
     setCategoryId(cat.id);
     setCategoryName(cat.name);
+  };
+
+  const handleSelectChange2 = (val) => {
+    const cat = JSON.parse(val);
+    setUpCat(cat.name);
   };
 
   if (isLoaded) {
@@ -818,17 +1015,50 @@ const Products = () => {
                   >
                     <HiOutlineEye />
                   </button>
-                  <button className="upd" title="edit">
+                  <button
+                    className="upd"
+                    title="edit"
+                    onClick={() => {
+                      setProdToBeUpdated(prod);
+                      setUpImg(prod.productImage);
+                      setUpPname(prod.productName);
+                      setUpUnit(prod.unit);
+                      setUpCat(prod.category);
+
+                      if (prod.unit === unit.piece) {
+                        setUpSpPcs(prod.price);
+                      } else if (prod.unit === unit.pack) {
+                        setUpSpPack(prod.price.pack);
+                        setUpSpPackPcs(prod.price.pcs);
+                      } else if (prod.unit === unit.box) {
+                        setUpSpBox(prod.price.box);
+                        setUpSpBoxPcs(prod.price.pcs);
+                      } else if (prod.unit === unit.roll) {
+                        setUpSpRoll(prod.price.roll);
+                        setUpSpMeter(prod.price.meter);
+                      } else if (prod.unit === unit.set) {
+                        setUpSpSet(prod.price.set);
+                        setUpSpSetPcs(prod.price.pcs);
+                      } else if (prod.unit === unit.pair) {
+                        setUpSpPair(prod.price);
+                      } else if (prod.unit === unit.bundle) {
+                        setUpSpBundle(prod.price.bundle);
+                        setUpSpBundlePcs(prod.price.pcs);
+                      }
+
+                      setIsUpModal(true);
+                    }}
+                  >
                     <BiSolidEdit />
                   </button>
                   <button
                     className="del"
-                    title="delete"
+                    title="archive"
                     onClick={() =>
                       setIsDeleteModal({ mode: true, id: prod.id })
                     }
                   >
-                    <RiDeleteBin6Line />
+                    <IoArchive />
                   </button>
                 </td>
               </tr>
@@ -1292,6 +1522,257 @@ const Products = () => {
             </div>
           </div>
         </div>
+        <div className={isUpModal ? "modal d-flex" : "modal d-none"}>
+          <div className="modal-body">
+            <button className="modal-close" onClick={() => setIsUpModal(false)}>
+              <RiCloseLine />
+            </button>
+            <div className="modal-content">
+              <h3 className="modal-title">Edit Product</h3>
+              <div className="modal-flex">
+                <div className="modal-left">
+                  <div className="img-preview">
+                    <img id="uimg" alt="logo" src={upImg} />
+                  </div>
+                  <p>Product Image</p>
+                  <input
+                    type="file"
+                    id="uimgs"
+                    onChange={(e) => {
+                      document.getElementById("uimg").src =
+                        URL.createObjectURL(e.target.files[0]) + "#toolbar=0";
+                      setImg2(e.target.files[0]);
+                    }}
+                  />
+                </div>
+                <div className="modal-right">
+                  <div className="input-group w-100">
+                    <label>Product Name</label>
+                    <input
+                      id="prod-name"
+                      type="text"
+                      value={upPname}
+                      onChange={(e) => setUpPname(e.target.value)}
+                    />
+                  </div>
+                  <div className="input-group w-100">
+                    <label>Category</label>
+                    <select
+                      onChange={(e) => {
+                        handleSelectChange2(e.target.value);
+                      }}
+                    >
+                      {categories.map((c, id) => (
+                        <option
+                          value={JSON.stringify(c)}
+                          selected={c.name === upCat ? true : false}
+                          key={id}
+                        >
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Pcs */}
+
+                  <div
+                    className={
+                      upUnit === "Piece"
+                        ? "w-100 flex-wrap"
+                        : "w-100 flex-wrap d-none"
+                    }
+                  >
+                    <div className="input-group w-100">
+                      <label>Selling Price per Piece</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpPcs}
+                        onChange={(e) => setUpSpPcs(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Pack */}
+
+                  <div
+                    className={
+                      upUnit === "Pack"
+                        ? "w-100 flex-wrap"
+                        : "w-100 flex-wrap d-none"
+                    }
+                  >
+                    <div className="input-group w-100">
+                      <label>Selling Price per Pack</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpPack}
+                        onChange={(e) => setUpSpPack(e.target.value)}
+                      />
+                    </div>
+                    <div className="input-group w-100">
+                      <label>Selling Price per Piece</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpPackPcs}
+                        onChange={(e) => setUpSpPackPcs(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Box */}
+
+                  <div
+                    className={
+                      upUnit === "Box"
+                        ? "w-100 flex-wrap"
+                        : "w-100 flex-wrap d-none"
+                    }
+                  >
+                    <div className="input-group w-100">
+                      <label>Selling Price per Box</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpBox}
+                        onChange={(e) => setUpSpBox(e.target.value)}
+                      />
+                    </div>
+                    <div className="input-group w-100">
+                      <label>Selling Price per Piece</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpBoxPcs}
+                        onChange={(e) => setUpSpBoxPcs(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Roll */}
+
+                  <div
+                    className={
+                      upUnit === "Roll"
+                        ? "w-100 flex-wrap"
+                        : "w-100 flex-wrap d-none"
+                    }
+                  >
+                    <div className="input-group w-100">
+                      <label>Selling Price per Roll</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpRoll}
+                        onChange={(e) => setUpSpRoll(e.target.value)}
+                      />
+                    </div>
+                    <div className="input-group w-100">
+                      <label>Selling Price per Meter</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpMeter}
+                        onChange={(e) => setUpSpMeter(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Set */}
+
+                  <div
+                    className={
+                      upUnit === "Set"
+                        ? "w-100 flex-wrap"
+                        : "w-100 flex-wrap d-none"
+                    }
+                  >
+                    <div className="input-group w-100">
+                      <label>Selling Price per Set</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpSet}
+                        onChange={(e) => setUpSpSet(e.target.value)}
+                      />
+                    </div>
+                    <div className="input-group w-100">
+                      <label>Selling Price per Piece</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpSetPcs}
+                        onChange={(e) => setUpSpSetPcs(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Pair */}
+
+                  <div
+                    className={
+                      upUnit === "Pair"
+                        ? "w-100 flex-wrap"
+                        : "w-100 flex-wrap d-none"
+                    }
+                  >
+                    <div className="input-group w-100">
+                      <label>Selling Price per Pair</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpPair}
+                        onChange={(e) => setUpSpPair(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Bundle */}
+
+                  <div
+                    className={
+                      upUnit === "Bundle"
+                        ? "w-100 flex-wrap"
+                        : "w-100 flex-wrap d-none"
+                    }
+                  >
+                    <div className="input-group w-100">
+                      <label>Selling Price per Bundle</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpBundle}
+                        onChange={(e) => setUpSpBundle(e.target.value)}
+                      />
+                    </div>
+                    <div className="input-group w-100">
+                      <label>Selling Price per Piece</label>
+                      <input
+                        className="money"
+                        type="number"
+                        value={upSpBundlePcs}
+                        onChange={(e) => setUpSpBundlePcs(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mb-container w-100">
+                    <button
+                      className="bg-orange"
+                      id="ubtn"
+                      onClick={() => updateProduct()}
+                    >
+                      Update Product
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className={isDeleteModal.mode ? "modal d-flex" : "modal d-none"}>
           <div className="modal-body-delete">
             <button
@@ -1303,16 +1784,16 @@ const Products = () => {
             <div className="text-center">
               <IoWarningOutline className="icn" />
             </div>
-            <h3>Are you sure you want to delete this product?</h3>
+            <h3>Are you sure you want to archive this product?</h3>
             <p>
-              This action will permanently remove the product, and it cannot be
-              undone.
+              This action will remove the product in the product list, but
+              stayed in the database.
             </p>
             <button
               className="dbtns delete"
               onClick={() => deleteProd(isDeleteModal.id)}
             >
-              Delete
+              Archive
             </button>
             <button
               className="dbtns cancel"

@@ -43,6 +43,7 @@ const Sales = () => {
           <div className="search-bars">
             <input
               id="searchs"
+              className="w-300px"
               type="search"
               placeholder="Search sales here..."
               onKeyUp={(e) => searchTable(e)}

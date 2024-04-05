@@ -35,6 +35,16 @@ const Products = () => {
     }, 1000);
   }, []);
 
+  const searchTable = (e) => {
+    const lists = document.getElementById("tbody").querySelectorAll("tr");
+    const textToSearch = e.target.value.toUpperCase();
+    for (let i of lists) {
+      const text = i.innerText;
+      if (text.toUpperCase().indexOf(textToSearch) > -1) i.style.display = "";
+      else i.style.display = "none";
+    }
+  };
+
   if (isLoaded) {
     return (
       <div className="products">
@@ -42,9 +52,11 @@ const Products = () => {
           <h3 className="page-title">Products</h3>
           <div className="search-bars">
             <input
-              type="text"
+              type="search"
               className="w-300px"
               placeholder="Search products here..."
+              onKeyUp={(e) => searchTable(e)}
+              onChange={(e) => searchTable(e)}
             />
           </div>
         </div>

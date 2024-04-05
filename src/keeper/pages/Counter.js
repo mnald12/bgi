@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "../css/counter.css";
 import "../css/modal.css";
 import { RiCloseLine } from "react-icons/ri";
@@ -17,6 +17,9 @@ import {
 import { db } from "../../db/config";
 import Select from "react-select";
 import moment from "moment";
+import { SideData } from "../Keeper";
+import { cryptoRandomStringAsync } from "crypto-random-string";
+import { BiTrash } from "react-icons/bi";
 
 const Counter = () => {
   const unit = {
@@ -28,6 +31,8 @@ const Counter = () => {
     pair: "Pair",
     bundle: "Bundle",
   };
+
+  const { drafts, setDrafts } = useContext(SideData);
 
   const [isLoaded, setIsloaded] = useState(false);
   const [products, setProducts] = useState([]);
@@ -51,6 +56,13 @@ const Counter = () => {
   const [qtyPair, setQtyPair] = useState(0);
   const [qtyBundle, setQtyBundle] = useState(0);
   const [qtyBundlePcs, setQtyBundlePcs] = useState(0);
+
+  const [isDone, setIsDone] = useState(false);
+  const [cash, setCash] = useState(0);
+  const [change, setChange] = useState(0);
+  const [discount, setDiscount] = useState(0);
+
+  const [isPreview, setIsPreview] = useState(false);
 
   const options2 = (count, unit) => {
     const opts = [];
@@ -525,6 +537,9 @@ const Counter = () => {
       date: moment().format("LLL"),
       sales: total,
       data: newSalesData,
+      discount: discount,
+      cash: cash,
+      change: change,
     });
 
     if (newSale) {
@@ -534,12 +549,41 @@ const Counter = () => {
       setSales([]);
       setTotal(0);
       setIsloaded(true);
+      setDrafts((l) => l.filter((item) => item.name !== customer));
     }
+  };
+
+  const saveDraft = () => {
+    if (customer === "") {
+      document.getElementById("pn").classList.remove("d-none");
+      setTimeout(() => {
+        document.getElementById("pn").classList.add("d-none");
+      }, 2000);
+      return;
+    }
+
+    setIsloaded(false);
+
+    const newDraft = {
+      id: cryptoRandomStringAsync({ length: 10 }),
+      name: customer,
+      date: moment().format("LLL"),
+      datas: fieldData,
+      total: total,
+    };
+
+    setDrafts((prev) => [...prev, newDraft]);
+
+    setTimeout(() => {
+      setFieldData([]);
+      setIsloaded(true);
+    }, 1000);
   };
 
   const searchTable = (e) => {
     const lists = document
       .getElementById("btnlists")
+
       .querySelectorAll("button");
     const textToSearch = e.target.value.toUpperCase();
     for (let i of lists) {
@@ -547,6 +591,19 @@ const Counter = () => {
       if (text.toUpperCase().indexOf(textToSearch) > -1) i.style.display = "";
       else i.style.display = "none";
     }
+  };
+
+  const discountPercent = () => {
+    const percents = [];
+
+    for (let i = 0; i < 76; i++) {
+      percents.push({
+        value: i,
+        label: `${i}%`,
+      });
+    }
+
+    return percents;
   };
 
   if (isLoaded) {
@@ -571,8 +628,11 @@ const Counter = () => {
                   <button className="bg-red" onClick={() => setFieldData([])}>
                     Clear
                   </button>
-                  <button className="bg-green" onClick={() => saveSale()}>
-                    Save
+                  <button className="bg-orange" onClick={() => saveDraft()}>
+                    Draft
+                  </button>
+                  <button className="bg-green" onClick={() => setIsDone(true)}>
+                    Done
                   </button>
                 </div>
               </div>
@@ -777,8 +837,6 @@ const Counter = () => {
                       </td>
                     </tr>
                   ))}
-                </tbody>
-                <tfoot>
                   <tr>
                     <td></td>
                     <td></td>
@@ -795,11 +853,46 @@ const Counter = () => {
                       </b>
                     </td>
                   </tr>
-                </tfoot>
+                </tbody>
               </table>
             </div>
           ) : (
-            <p>Selected Products will apear here..</p>
+            <div>
+              {drafts.length > 0 ? (
+                <div className="drafts">
+                  <h3>Drafts</h3>
+                  {drafts.map((d, k) => (
+                    <div key={k} className="draftt">
+                      <button
+                        className="draft"
+                        onClick={() => {
+                          setCustomer(d.name);
+                          setFieldData(d.datas);
+                          setTotal(d.total);
+                        }}
+                      >
+                        <h3>{d.name}</h3>
+                        <p>{d.date}</p>
+                      </button>
+
+                      <button
+                        className="deldraft"
+                        onClick={() => {
+                          setDrafts((l) =>
+                            l.filter((item) => item.id !== d.id)
+                          );
+                        }}
+                      >
+                        <BiTrash color="red" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                ""
+              )}
+              <p className="par">Selected Products will apear here..</p>
+            </div>
           )}
         </div>
         <div className="product-lists">
@@ -823,6 +916,37 @@ const Counter = () => {
                 {prd.productName}
               </button>
             ))}
+          </div>
+        </div>
+
+        <div className={isDone ? "modal d-flex" : "modal d-none"}>
+          <div className="modal-body-counter">
+            <button className="modal-close" onClick={() => setIsDone(false)}>
+              <RiCloseLine />
+            </button>
+
+            <div className="input-groups mt-12px">
+              <label>Discount</label>
+              <Select
+                options={discountPercent()}
+                defaultValue={qtyPiece}
+                onChange={(e) => setDiscount(e.value)}
+              />
+            </div>
+
+            <div className="input-group mt-12px">
+              <label>Customer Cash</label>
+              <input
+                type="number"
+                className="money"
+                value={cash}
+                onChange={(e) => setCash(e.target.value)}
+              />
+            </div>
+            <br />
+            <button className="add-items" onClick={() => setIsPreview(true)}>
+              Save
+            </button>
           </div>
         </div>
 
@@ -1359,6 +1483,273 @@ const Counter = () => {
             >
               <FaPlus /> Add
             </button>
+          </div>
+        </div>
+        <div className={isPreview ? "modal d-flex" : "modal d-none"}>
+          <div className="modal-body">
+            <button className="modal-close" onClick={() => setIsPreview(false)}>
+              <RiCloseLine />
+            </button>
+            <table className="ctbl tb2">
+              <thead className="">
+                <tr>
+                  <th>Product Name</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {fieldData.map((f, k) => (
+                  <tr key={k}>
+                    <td>{f.prodName}</td>
+                    <td>
+                      {f.unit === unit.piece ? (
+                        `${f.qty} Pcs`
+                      ) : f.unit === unit.pack ? (
+                        <>
+                          {f.qty.pack > 0 && f.qty.pcs > 0
+                            ? `${f.qty.pack} Pack & ${f.qty.pcs} Pcs`
+                            : f.qty.pack > 0 && f.qty.pcs <= 0
+                            ? `${f.qty.pack} Pack`
+                            : `${f.qty.pcs} Pcs`}
+                        </>
+                      ) : f.unit === unit.box ? (
+                        <>
+                          {f.qty.box > 0 && f.qty.pcs > 0
+                            ? `${f.qty.box} Box & ${f.qty.pcs} Pcs`
+                            : f.qty.box > 0 && f.qty.pcs <= 0
+                            ? `${f.qty.box} Box`
+                            : `${f.qty.pcs} Pcs`}
+                        </>
+                      ) : f.unit === unit.roll ? (
+                        <>
+                          {f.qty.roll > 0 && f.qty.meter > 0
+                            ? `${f.qty.roll} Roll & ${f.qty.meter} Meter`
+                            : f.qty.roll > 0 && f.qty.meter <= 0
+                            ? `${f.qty.roll} Roll`
+                            : `${f.qty.meter} Meter`}
+                        </>
+                      ) : f.unit === unit.set ? (
+                        <>
+                          {f.qty.set > 0 && f.qty.pcs > 0
+                            ? `${f.qty.set} Set & ${f.qty.pcs} Pcs`
+                            : f.qty.set > 0 && f.qty.pcs <= 0
+                            ? `${f.qty.set} Set`
+                            : `${f.qty.pcs} Pcs`}
+                        </>
+                      ) : f.unit === unit.pair ? (
+                        `${f.qty} Pair`
+                      ) : f.unit === unit.bundle ? (
+                        <>
+                          {f.qty.bundle > 0 && f.qty.pcs > 0
+                            ? `${f.qty.bundle} Bundle & ${f.qty.pcs} Pcs`
+                            : f.qty.bundle > 0 && f.qty.pcs <= 0
+                            ? `${f.qty.bundle} Bundle`
+                            : `${f.qty.pcs} Pcs`}
+                        </>
+                      ) : (
+                        ""
+                      )}
+                    </td>
+                    <td>
+                      {f.unit === unit.piece ? (
+                        `₱${f.price.toLocaleString("en", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })} / Pcs`
+                      ) : f.unit === unit.pack ? (
+                        <>
+                          {f.qty.pack > 0 && f.qty.pcs > 0
+                            ? `₱${f.price.pack.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Pack & ₱${f.price.pcs.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Pcs`
+                            : f.qty.pack > 0 && f.qty.pcs <= 0
+                            ? `₱${f.price.pack.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Pack`
+                            : `₱${f.price.pcs.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Pcs`}
+                        </>
+                      ) : f.unit === unit.box ? (
+                        <>
+                          {f.qty.box > 0 && f.qty.pcs > 0
+                            ? `₱${f.price.box.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Box & ₱${f.price.pcs.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Pcs`
+                            : f.qty.box > 0 && f.qty.pcs <= 0
+                            ? `₱${f.price.box.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Box`
+                            : `₱${f.price.pcs.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Pcs`}
+                        </>
+                      ) : f.unit === unit.roll ? (
+                        <>
+                          {f.qty.roll > 0 && f.qty.meter > 0
+                            ? `₱${f.price.roll.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Roll & ₱${f.price.meter.toLocaleString(
+                                "en",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )} / Meter`
+                            : f.qty.roll > 0 && f.qty.meter <= 0
+                            ? `₱${f.price.roll.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Roll`
+                            : `₱${f.price.meter.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Meter`}
+                        </>
+                      ) : f.unit === unit.set ? (
+                        <>
+                          {f.qty.set > 0 && f.qty.pcs > 0
+                            ? `₱${f.price.set.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Set & ₱${f.price.pcs.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Pcs`
+                            : f.qty.set > 0 && f.qty.pcs <= 0
+                            ? `₱${f.price.set.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Set`
+                            : `₱${f.price.pcs.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Pcs`}
+                        </>
+                      ) : f.unit === unit.pair ? (
+                        `₱${f.price.toLocaleString("en", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })} / Pair`
+                      ) : f.unit === unit.bundle ? (
+                        <>
+                          {f.qty.bundle > 0 && f.qty.pcs > 0
+                            ? `₱${f.price.bundle.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Bundle & ₱${f.price.pcs.toLocaleString(
+                                "en",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )} / Pcs`
+                            : f.qty.bundle > 0 && f.qty.pcs <= 0
+                            ? `₱${f.price.bundle.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Bundle`
+                            : `₱${f.price.pcs.toLocaleString("en", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })} / Pcs`}
+                        </>
+                      ) : (
+                        ""
+                      )}
+                    </td>
+                    <td>
+                      ₱
+                      {f.total.toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot className="tfoot">
+                <tr className="trss">
+                  <td></td>
+                  <td></td>
+                  <td>Subtotal :</td>
+                  <td>
+                    ₱
+                    {total.toLocaleString("en", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </td>
+                </tr>
+                <tr className="trss">
+                  <td></td>
+                  <td></td>
+                  <td>Discount {`(${discount}%)`} :</td>
+                  <td>
+                    ₱
+                    {total.toLocaleString("en", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </td>
+                </tr>
+                <tr className="trss">
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <b>Total :</b>
+                  </td>
+                  <td>
+                    <b>
+                      ₱
+                      {total.toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </b>
+                  </td>
+                </tr>
+                <tr className="trss">
+                  <td></td>
+                  <td></td>
+                  <td>Cash :</td>
+                  <td>
+                    ₱
+                    {cash.toLocaleString("en", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </td>
+                </tr>
+                <tr className="trss">
+                  <td></td>
+                  <td></td>
+                  <td>Change :</td>
+                  <td>
+                    ₱
+                    {change.toLocaleString("en", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </div>
       </div>

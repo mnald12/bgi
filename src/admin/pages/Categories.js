@@ -10,6 +10,7 @@ import {
   getDocs,
   orderBy,
   query,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../db/config";
 import { IoWarningOutline } from "react-icons/io5";
@@ -19,8 +20,11 @@ const Categories = () => {
   const [isLoaded, setIsloaded] = useState(false);
   const [catName, setCatName] = useState("");
   const [isModal, setIsModal] = useState(false);
+  const [isUpModal, setIsUpModal] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [idToDelete, setIdToDelete] = useState("");
+  const [toUpdateCatId, setToUpdateCatId] = useState("");
+  const [toUpdateCatName, setToUpdateCatName] = useState("");
 
   useEffect(() => {
     const get = async () => {
@@ -58,6 +62,21 @@ const Categories = () => {
       },
     ]);
     setIsModal(false);
+  };
+
+  const updateCategory = async () => {
+    await updateDoc(doc(db, "categories", toUpdateCatId), {
+      name: toUpdateCatName,
+    });
+    const q = query(collection(db, "categories"), orderBy("name"));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot) {
+      const cats = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+      setCategories(cats);
+    }
+    setIsUpModal(false);
   };
 
   const searchTable = (e) => {
@@ -117,7 +136,15 @@ const Categories = () => {
                   })}
                 </td>
                 <td className="btn-flex">
-                  <button className="upd" title="edit">
+                  <button
+                    className="upd"
+                    title="edit"
+                    onClick={() => {
+                      setToUpdateCatId(cat.id);
+                      setToUpdateCatName(cat.name);
+                      setIsUpModal(true);
+                    }}
+                  >
                     <BiSolidEdit />
                   </button>
                   <button
@@ -155,6 +182,33 @@ const Categories = () => {
             <div className="w-100 text-right">
               <button className="cbtn" onClick={() => addCategory()}>
                 Add Category
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className={isUpModal ? "modal d-flex" : "modal d-none"}>
+          <div className="modal-body-delete">
+            <button className="modal-close" onClick={() => setIsUpModal(false)}>
+              <RiCloseLine />
+            </button>
+            <h3 className="modal-title">Edit Category</h3>
+            <div className="input-group w-100">
+              <p id="unoname" className="d-none color-red">
+                The category name cannot be left empty
+              </p>
+              <label>Category Name</label>
+              <input
+                type="text"
+                value={toUpdateCatName}
+                onChange={(e) => setToUpdateCatName(e.target.value)}
+              />
+            </div>
+            <div className="w-100 text-right">
+              <button
+                className="cbtn bg-orange"
+                onClick={() => updateCategory()}
+              >
+                Update Category
               </button>
             </div>
           </div>

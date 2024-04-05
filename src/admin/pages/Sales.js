@@ -1,10 +1,12 @@
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { db } from "../../db/config";
 import { BsEyeFill } from "react-icons/bs";
 import Loader from "../components/Loader";
+import { SideData } from "../Admin";
 
 const Sales = () => {
+  const { setSideActive, setSaleId } = useContext(SideData);
   const [isLoaded, setIsloaded] = useState(false);
   const [sales, setSales] = useState([]);
 
@@ -44,6 +46,7 @@ const Sales = () => {
             <input
               id="searchs"
               type="search"
+              className="w-300px"
               placeholder="Search sales here..."
               onKeyUp={(e) => searchTable(e)}
               onChange={(e) => searchTable(e)}
@@ -75,7 +78,14 @@ const Sales = () => {
                   })}
                 </td>
                 <td className="btn-flex">
-                  <button className="view" title="view">
+                  <button
+                    className="view"
+                    title="view"
+                    onClick={() => {
+                      setSaleId(sale.id);
+                      setSideActive("sale");
+                    }}
+                  >
                     <BsEyeFill />
                   </button>
                 </td>

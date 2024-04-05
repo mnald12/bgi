@@ -13,6 +13,7 @@ const SideData = createContext(null);
 
 const Keeper = () => {
   const [sideActive, setSideActive] = useState("dashboard");
+  const [drafts, setDrafts] = useState([]);
 
   const Outlet = () => {
     if (sideActive === "dashboard") {
@@ -28,7 +29,9 @@ const Keeper = () => {
 
   return (
     <div className="flex-container">
-      <SideData.Provider value={{ sideActive, setSideActive }}>
+      <SideData.Provider
+        value={{ sideActive, setSideActive, drafts, setDrafts }}
+      >
         <Sidebar />
         <div className="contents">
           <Header />
