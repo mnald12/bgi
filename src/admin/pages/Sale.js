@@ -67,7 +67,7 @@ const Sale = () => {
             <tbody>
               {data.data.map((f, k) => (
                 <tr key={k}>
-                  <td>{f.prodName}</td>
+                  <td>{f.productName}</td>
                   <td>
                     {f.unit === unit.piece ? (
                       `${f.qty} Pcs`
