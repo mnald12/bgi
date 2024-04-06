@@ -20,6 +20,8 @@ import moment from "moment";
 import { SideData } from "../Keeper";
 import { cryptoRandomStringAsync } from "crypto-random-string";
 import { BiTrash } from "react-icons/bi";
+import { FcPrint } from "react-icons/fc";
+import logo from "../../admin/images/logo.png";
 
 const Counter = () => {
   const unit = {
@@ -40,6 +42,7 @@ const Counter = () => {
   const [isModal, setIsModal] = useState(false);
   const [data, setData] = useState({});
   const [total, setTotal] = useState(0);
+  const [totalAmmount, setTotalAmmount] = useState(0);
 
   const [customer, setCustomer] = useState("");
   const [sales, setSales] = useState([]);
@@ -57,11 +60,10 @@ const Counter = () => {
   const [qtyBundle, setQtyBundle] = useState(0);
   const [qtyBundlePcs, setQtyBundlePcs] = useState(0);
 
-  const [isDone, setIsDone] = useState(false);
   const [cash, setCash] = useState(0);
   const [change, setChange] = useState(0);
   const [discount, setDiscount] = useState(0);
-
+  const [totalDiscount, setTotalDiscount] = useState(0);
   const [isPreview, setIsPreview] = useState(false);
 
   const options2 = (count, unit) => {
@@ -119,8 +121,6 @@ const Counter = () => {
 
       return;
     }
-
-    setIsloaded(false);
 
     const newSalesData = [];
 
@@ -524,33 +524,25 @@ const Counter = () => {
       newSalesData.push(i);
     }
 
-    const q = query(collection(db, "products"), orderBy("productName"));
-    const querySnapshot = await getDocs(q);
-    const prods = querySnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() };
-    });
-
     const saleRef = collection(db, "sales");
 
     const newSale = await addDoc(saleRef, {
       customer: customer,
       date: moment().format("LLL"),
-      sales: total,
+      sales: totalAmmount,
       data: newSalesData,
+      total: total,
+      totalAmmount: totalAmmount,
       discount: discount,
+      totalDiscount: totalDiscount,
       cash: cash,
       change: change,
+      cashier: "Marriano Garapon",
     });
 
     if (newSale) {
-      setProducts(prods);
-      setData(prods[0]);
-      setFieldData([]);
-      setSales([]);
-      setTotal(0);
-      setIsloaded(true);
-      setDrafts((l) => l.filter((item) => item.name !== customer));
     }
+    setIsPreview(true);
   };
 
   const saveDraft = () => {
@@ -570,6 +562,11 @@ const Counter = () => {
       date: moment().format("LLL"),
       datas: fieldData,
       total: total,
+      cash: cash,
+      totalDiscount: totalDiscount,
+      discount: discount,
+      totalAmmount,
+      change: change,
     };
 
     setDrafts((prev) => [...prev, newDraft]);
@@ -606,6 +603,11 @@ const Counter = () => {
     return percents;
   };
 
+  useEffect(() => {
+    setTotalAmmount(total - totalDiscount);
+    setChange(cash - totalAmmount);
+  }, [cash, total, totalAmmount, totalDiscount]);
+
   if (isLoaded) {
     return (
       <div className="counter">
@@ -631,11 +633,35 @@ const Counter = () => {
                   <button className="bg-orange" onClick={() => saveDraft()}>
                     Draft
                   </button>
-                  <button className="bg-green" onClick={() => setIsDone(true)}>
-                    Done
+                  <button className="bg-green" onClick={() => saveSale()}>
+                    Save
                   </button>
                 </div>
               </div>
+              <div className="d-flexs">
+                <div className="input-groups w-50">
+                  <label>Discount</label>
+                  <Select
+                    options={discountPercent()}
+                    defaultValue={qtyPiece}
+                    onChange={(e) => {
+                      setDiscount(e.value);
+                      setTotalDiscount((e.value / 100) * total);
+                    }}
+                  />
+                </div>
+
+                <div className="input-group w-50">
+                  <label>Customer Cash</label>
+                  <input
+                    type="number"
+                    className="money cash"
+                    value={cash}
+                    onChange={(e) => setCash(e.target.value)}
+                  />
+                </div>
+              </div>
+              <br />
               <table className="ctbl">
                 <thead>
                   <tr>
@@ -837,7 +863,33 @@ const Counter = () => {
                       </td>
                     </tr>
                   ))}
-                  <tr>
+                </tbody>
+                <tfoot className="tfoot">
+                  <tr className="trss">
+                    <td></td>
+                    <td></td>
+                    <td>Subtotal :</td>
+                    <td>
+                      ₱
+                      {total.toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                  <tr className="trs">
+                    <td></td>
+                    <td></td>
+                    <td>Discount {`(${discount}%)`} :</td>
+                    <td>
+                      ₱
+                      {totalDiscount.toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                  <tr className="trs">
                     <td></td>
                     <td></td>
                     <td>
@@ -846,14 +898,38 @@ const Counter = () => {
                     <td>
                       <b>
                         ₱
-                        {total.toLocaleString("en", {
+                        {totalAmmount.toLocaleString("en", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
                       </b>
                     </td>
                   </tr>
-                </tbody>
+                  <tr className="trs">
+                    <td></td>
+                    <td></td>
+                    <td>Cash :</td>
+                    <td>
+                      ₱
+                      {cash.toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                  <tr className="trs">
+                    <td></td>
+                    <td></td>
+                    <td>Change :</td>
+                    <td>
+                      ₱
+                      {change.toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           ) : (
@@ -869,6 +945,11 @@ const Counter = () => {
                           setCustomer(d.name);
                           setFieldData(d.datas);
                           setTotal(d.total);
+                          setDiscount(d.discount);
+                          setCash(d.cash);
+                          setTotalDiscount(d.totalDiscount);
+                          setTotalAmmount(d.totalAmmount);
+                          setChange(d.change);
                         }}
                       >
                         <h3>{d.name}</h3>
@@ -916,37 +997,6 @@ const Counter = () => {
                 {prd.productName}
               </button>
             ))}
-          </div>
-        </div>
-
-        <div className={isDone ? "modal d-flex" : "modal d-none"}>
-          <div className="modal-body-counter">
-            <button className="modal-close" onClick={() => setIsDone(false)}>
-              <RiCloseLine />
-            </button>
-
-            <div className="input-groups mt-12px">
-              <label>Discount</label>
-              <Select
-                options={discountPercent()}
-                defaultValue={qtyPiece}
-                onChange={(e) => setDiscount(e.value)}
-              />
-            </div>
-
-            <div className="input-group mt-12px">
-              <label>Customer Cash</label>
-              <input
-                type="number"
-                className="money"
-                value={cash}
-                onChange={(e) => setCash(e.target.value)}
-              />
-            </div>
-            <br />
-            <button className="add-items" onClick={() => setIsPreview(true)}>
-              Save
-            </button>
           </div>
         </div>
 
@@ -1485,11 +1535,65 @@ const Counter = () => {
             </button>
           </div>
         </div>
-        <div className={isPreview ? "modal d-flex" : "modal d-none"}>
-          <div className="modal-body">
-            <button className="modal-close" onClick={() => setIsPreview(false)}>
+        <div className={isPreview ? "modals d-flex" : "modals d-none"}>
+          <div className="modal-bodys">
+            <button
+              className="modal-close"
+              title="close"
+              onClick={async () => {
+                setIsPreview(false);
+                setFieldData([]);
+                setSales([]);
+                setTotal(0);
+                setCash(0);
+                setTotalAmmount(0);
+                setTotalDiscount(0);
+                setDiscount(0);
+                setChange(0);
+                const q = query(
+                  collection(db, "products"),
+                  orderBy("productName")
+                );
+                const querySnapshot = await getDocs(q);
+                const prods = querySnapshot.docs.map((doc) => {
+                  return { id: doc.id, ...doc.data() };
+                });
+                setProducts(prods);
+                setData(prods[0]);
+              }}
+            >
               <RiCloseLine />
             </button>
+            <button
+              className="modal-print"
+              title="print"
+              onClick={() => setIsPreview(false)}
+            >
+              <FcPrint />
+            </button>
+            <img className="logs" alt="logo" src={logo} />
+            <div className="reciept">
+              <h3>
+                BGI Electrical Contractors, Supplies and Manpower Services
+              </h3>
+              <p>
+                Maharlika Highway (across SORECO II NGCCP) Cabid-an Sorsogon
+                City
+              </p>
+              <p>(056) 311 4057</p>
+
+              <br />
+
+              <p>
+                Customer : <span>{customer}</span>
+              </p>
+              <p>
+                Date : <span>{moment().format("LLL")}</span>
+              </p>
+              <p>
+                Cashier : <span>Gina S</span>
+              </p>
+            </div>
             <table className="ctbl tb2">
               <thead className="">
                 <tr>
@@ -1696,19 +1800,19 @@ const Counter = () => {
                     })}
                   </td>
                 </tr>
-                <tr className="trss">
+                <tr className="trs">
                   <td></td>
                   <td></td>
                   <td>Discount {`(${discount}%)`} :</td>
                   <td>
                     ₱
-                    {total.toLocaleString("en", {
+                    {totalDiscount.toLocaleString("en", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
                   </td>
                 </tr>
-                <tr className="trss">
+                <tr className="trs">
                   <td></td>
                   <td></td>
                   <td>
@@ -1717,14 +1821,14 @@ const Counter = () => {
                   <td>
                     <b>
                       ₱
-                      {total.toLocaleString("en", {
+                      {totalAmmount.toLocaleString("en", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     </b>
                   </td>
                 </tr>
-                <tr className="trss">
+                <tr className="trs">
                   <td></td>
                   <td></td>
                   <td>Cash :</td>
@@ -1736,7 +1840,7 @@ const Counter = () => {
                     })}
                   </td>
                 </tr>
-                <tr className="trss">
+                <tr className="trs">
                   <td></td>
                   <td></td>
                   <td>Change :</td>

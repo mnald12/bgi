@@ -232,8 +232,6 @@
 
 .ctbl tfoot {
   background-color: white;
-  position: sticky;
-  bottom: -12px;
 }
 
 .counter-select-field {
@@ -405,10 +403,48 @@
 }
 
 .tb2 {
-  transform: translateY(-10px);
+  width: 99% !important;
+  transform: translateY(0);
+  margin-top: 10px;
 }
 
 .tb2 th {
   position: sticky !important;
   top: 0 !important;
+}
+
+.logs {
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  right: 20px;
+  border-radius: 6px;
+}
+
+.reciept span {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.scrollables {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 10px;
+}
+
+.mbress {
+  height: auto !important;
+  max-height: auto !important;
+}
+
+.d-flexs {
+  width: calc(100% - 10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.cash {
+  padding: 14px;
 }
