@@ -53,15 +53,19 @@ const Sidebar = () => {
         </button>
         <div className="divider">
           <div className="line"></div>
-          <h5>System</h5>
+          <h5>Accounts</h5>
         </div>
         <button
           className={sideActive === "profile" ? "active" : ""}
           onClick={() => setSideActive("profile")}
         >
           <IoPerson className="icn" />
-          Profile
+          My Profile
         </button>
+        <div className="divider">
+          <div className="line"></div>
+          <h5>System</h5>
+        </div>
         <button
           className={sideActive === "help" ? "active" : ""}
           onClick={() => setSideActive("help")}

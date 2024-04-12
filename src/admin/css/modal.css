@@ -44,6 +44,7 @@
 
 .modal-bodys {
   width: 80vw;
+  max-width: 800px;
   height: auto;
   border-radius: 6px;
   background: white;

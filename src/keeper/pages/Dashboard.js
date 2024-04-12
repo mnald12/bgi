@@ -1,17 +1,11 @@
-import CountUp from "react-countup";
 import "../css/dashboard.css";
 import growth from "../images/growth.png";
 import LineChart from "../hooks/Lines";
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
-import {
-  lastMonthsSales,
-  lastYearSales,
-  thisMonthsSales,
-  thisYearSales,
-  todaysSales,
-  yesterdaysSales,
-} from "../../datas";
+import { collection, getDocs, query } from "firebase/firestore";
+import { db } from "../../db/config";
+import moment from "moment/moment";
 
 const options = {
   minimumFractionDigits: 2,
@@ -23,13 +17,79 @@ const fn = (n) => {
 };
 
 const checkDiff = (n1, n2) => {
-  return 100 * Math.abs((n1 - n2) / ((n1 + n2) / 2)).toFixed(2);
+  const p = 100 * Math.abs((n1 - n2) / ((n1 + n2) / 2)).toFixed(2);
+  if (p > 100) return p - 100;
+  else return p;
 };
 
 const Dashboard = () => {
   const [isLoaded, setIsloaded] = useState(false);
 
+  const [todaysSales, setTodaysSales] = useState(0);
+  const [yesterdaysSales, setYesterdaysSales] = useState(0);
+  const [thisMonthsSales, setThisMonthsSales] = useState(0);
+  const [lastMonthsSales, setLastMonthsSales] = useState(0);
+  const [thisYearSales, setThisYearSales] = useState(0);
+  const [lastYearSales, setLastYearSales] = useState(0);
+
   useEffect(() => {
+    const getSales = async () => {
+      const q = query(collection(db, "sales"));
+      const querySnapshot = await getDocs(q);
+      const sales = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+
+      const m = +moment().format("M");
+      const d = +moment().format("D");
+      const y = +moment().format("YYYY");
+
+      let ts = 0;
+      let ys = 0;
+
+      let tms = 0;
+      let lms = 0;
+
+      let tys = 0;
+      let lys = 0;
+
+      for (let i of sales) {
+        if (i.dates.year === y && i.dates.month === m && i.dates.day === d) {
+          ts += i.sales;
+          console.log("td");
+        }
+        if (
+          i.dates.year === y &&
+          i.dates.month === m &&
+          i.dates.day === d - 1
+        ) {
+          ys += i.sales;
+        }
+        if (i.dates.year === y && i.dates.month === m) {
+          tms += i.sales;
+        }
+        if (i.dates.year === y && i.dates.month === m - 1) {
+          lms += i.sales;
+        }
+
+        if (i.dates.year === y) {
+          tys += i.sales;
+        }
+        if (i.dates.year === y - 1) {
+          lys += i.sales;
+        }
+      }
+
+      setTodaysSales(ts);
+      setYesterdaysSales(ys);
+      setThisMonthsSales(tms);
+      setLastMonthsSales(lms);
+      setThisYearSales(tys);
+      setLastYearSales(lys);
+    };
+
+    getSales();
+
     setTimeout(() => {
       setIsloaded(true);
     }, 1000);
@@ -43,17 +103,7 @@ const Dashboard = () => {
           <div className="dashcard-3">
             <div className="card-content">
               <p>Today's Sales</p>
-              <h4>
-                ₱{" "}
-                <CountUp
-                  end={todaysSales}
-                  duration={3}
-                  decimals={2}
-                  decimal="."
-                >
-                  {({ countUpRef }) => <span ref={countUpRef} />}
-                </CountUp>
-              </h4>
+              <h4>₱ {fn(todaysSales)}</h4>
               <div className="card-bottom">
                 <p>₱ {fn(yesterdaysSales)} Yesterday</p>
                 {todaysSales > yesterdaysSales ? (
@@ -72,17 +122,7 @@ const Dashboard = () => {
           <div className="dashcard-3">
             <div className="card-content">
               <p>This Month's Sales</p>
-              <h4>
-                ₱{" "}
-                <CountUp
-                  end={thisMonthsSales}
-                  duration={3}
-                  decimals={2}
-                  decimal="."
-                >
-                  {({ countUpRef }) => <span ref={countUpRef} />}
-                </CountUp>
-              </h4>
+              <h4>₱ {fn(thisMonthsSales)}</h4>
               <div className="card-bottom">
                 <p>₱ {fn(lastMonthsSales)} Last Month</p>
                 {thisMonthsSales > lastMonthsSales ? (
@@ -101,17 +141,7 @@ const Dashboard = () => {
           <div className="dashcard-3">
             <div className="card-content">
               <p>This Year's Sales</p>
-              <h4>
-                ₱{" "}
-                <CountUp
-                  end={thisYearSales}
-                  duration={3}
-                  decimals={2}
-                  decimal="."
-                >
-                  {({ countUpRef }) => <span ref={countUpRef} />}
-                </CountUp>
-              </h4>
+              <h4>₱ {fn(thisYearSales)}</h4>
               <div className="card-bottom">
                 <p>₱ {fn(lastYearSales)} Last Year</p>
                 {thisYearSales > lastYearSales ? (

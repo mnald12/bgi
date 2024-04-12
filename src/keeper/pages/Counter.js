@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import "../css/counter.css";
 import "../css/modal.css";
 import { RiCloseLine } from "react-icons/ri";
@@ -22,6 +22,7 @@ import { cryptoRandomStringAsync } from "crypto-random-string";
 import { BiTrash } from "react-icons/bi";
 import { FcPrint } from "react-icons/fc";
 import logo from "../../admin/images/logo.png";
+import { useReactToPrint } from "react-to-print";
 
 const Counter = () => {
   const unit = {
@@ -34,7 +35,13 @@ const Counter = () => {
     bundle: "Bundle",
   };
 
-  const { drafts, setDrafts } = useContext(SideData);
+  const { user, drafts, setDrafts } = useContext(SideData);
+
+  const componentRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
 
   const [isLoaded, setIsloaded] = useState(false);
   const [products, setProducts] = useState([]);
@@ -123,6 +130,7 @@ const Counter = () => {
     }
 
     const newSalesData = [];
+    let incomes = 0;
 
     for (let i of sales) {
       if (i.unit === unit.piece) {
@@ -132,6 +140,7 @@ const Counter = () => {
 
         const nc = currentDoc.price - currentDoc.capital;
         const nIncome = i.qty * nc;
+        incomes += nIncome;
 
         await updateDoc(doc(db, "products", i.prodId), {
           stocks: currentDoc.stocks - i.qty,
@@ -146,6 +155,7 @@ const Counter = () => {
 
         const nc = currentDoc.price - currentDoc.capital;
         const nIncome = i.qty * nc;
+        incomes += nIncome;
 
         await updateDoc(doc(db, "products", i.prodId), {
           stocks: currentDoc.stocks - i.qty,
@@ -163,6 +173,8 @@ const Counter = () => {
         const nc2 = currentDoc.price.pcs - cap2;
         const nIncome1 = i.qty.pack * nc;
         const nIncome2 = i.qty.pcs * nc2;
+
+        incomes += nIncome1 + nIncome2;
 
         const newSold = {
           pack: 0,
@@ -234,6 +246,8 @@ const Counter = () => {
         const nIncome1 = i.qty.box * nc;
         const nIncome2 = i.qty.pcs * nc2;
 
+        incomes += nIncome1 + nIncome2;
+
         const newSold = {
           box: 0,
           pcs: 0,
@@ -303,6 +317,8 @@ const Counter = () => {
         const nc2 = currentDoc.price.meter - cap2;
         const nIncome1 = i.qty.roll * nc;
         const nIncome2 = i.qty.meter * nc2;
+
+        incomes += nIncome1 + nIncome2;
 
         const newSold = {
           roll: 0,
@@ -381,6 +397,8 @@ const Counter = () => {
         const nIncome1 = i.qty.set * nc;
         const nIncome2 = i.qty.pcs * nc2;
 
+        incomes += nIncome1 + nIncome2;
+
         const newSold = {
           set: 0,
           pcs: 0,
@@ -451,6 +469,8 @@ const Counter = () => {
         const nIncome1 = i.qty.bundle * nc;
         const nIncome2 = i.qty.pcs * nc2;
 
+        incomes += nIncome1 + nIncome2;
+
         const newSold = {
           box: 0,
           pcs: 0,
@@ -517,8 +537,10 @@ const Counter = () => {
       const catSnap = await getDoc(catRefs);
       const currentCat = catSnap.data();
 
+      const ns = (currentCat.sales += i.total);
+
       await updateDoc(doc(db, "categories", i.catId), {
-        sales: currentCat.sales + currentCat.sales + i.total,
+        sales: ns,
       });
 
       newSalesData.push(i);
@@ -530,6 +552,7 @@ const Counter = () => {
       customer: customer,
       date: moment().format("LLL"),
       sales: totalAmmount,
+      income: incomes,
       data: newSalesData,
       total: total,
       totalAmmount: totalAmmount,
@@ -537,12 +560,17 @@ const Counter = () => {
       totalDiscount: totalDiscount,
       cash: cash,
       change: change,
-      cashier: "Marriano Garapon",
+      cashier: user.fullName,
+      dates: {
+        month: +moment().format("M"),
+        day: +moment().format("D"),
+        year: +moment().format("YYYY"),
+      },
     });
 
     if (newSale) {
+      setIsPreview(true);
     }
-    setIsPreview(true);
   };
 
   const saveDraft = () => {
@@ -604,9 +632,10 @@ const Counter = () => {
   };
 
   useEffect(() => {
+    setTotalDiscount((discount / 100) * total);
     setTotalAmmount(total - totalDiscount);
     setChange(cash - totalAmmount);
-  }, [cash, total, totalAmmount, totalDiscount]);
+  }, [cash, discount, total, totalAmmount, totalDiscount]);
 
   if (isLoaded) {
     return (
@@ -669,6 +698,7 @@ const Counter = () => {
                     <th>Qty</th>
                     <th>Price</th>
                     <th>Amount</th>
+                    <th width="8%"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -861,6 +891,20 @@ const Counter = () => {
                           maximumFractionDigits: 2,
                         })}
                       </td>
+                      <td>
+                        <button
+                          title="remove"
+                          onClick={() => {
+                            const t = total - f.total;
+                            setTotal(t);
+                            setFieldData((l) =>
+                              l.filter((item) => item.id !== f.id)
+                            );
+                          }}
+                        >
+                          <BiTrash color="red" />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -911,7 +955,7 @@ const Counter = () => {
                     <td>Cash :</td>
                     <td>
                       ₱
-                      {cash.toLocaleString("en", {
+                      {parseInt(cash, 10).toLocaleString("en", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
@@ -923,10 +967,12 @@ const Counter = () => {
                     <td>Change :</td>
                     <td>
                       ₱
-                      {change.toLocaleString("en", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
+                      {cash > totalAmmount
+                        ? change.toLocaleString("en", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })
+                        : 0}
                     </td>
                   </tr>
                 </tfoot>
@@ -1241,6 +1287,7 @@ const Counter = () => {
                     setFieldData([
                       ...fieldData,
                       {
+                        id: cryptoRandomStringAsync({ length: 10 }),
                         prodName: data.productName,
                         unit: data.unit,
                         qty: qtyPiece,
@@ -1267,6 +1314,7 @@ const Counter = () => {
                     setFieldData([
                       ...fieldData,
                       {
+                        id: cryptoRandomStringAsync({ length: 10 }),
                         prodName: data.productName,
                         unit: data.unit,
                         qty: {
@@ -1313,6 +1361,7 @@ const Counter = () => {
                     setFieldData([
                       ...fieldData,
                       {
+                        id: cryptoRandomStringAsync({ length: 10 }),
                         prodName: data.productName,
                         unit: data.unit,
                         qty: {
@@ -1357,6 +1406,7 @@ const Counter = () => {
                     setFieldData([
                       ...fieldData,
                       {
+                        id: cryptoRandomStringAsync({ length: 10 }),
                         prodName: data.productName,
                         unit: data.unit,
                         qty: {
@@ -1403,6 +1453,7 @@ const Counter = () => {
                     setFieldData([
                       ...fieldData,
                       {
+                        id: cryptoRandomStringAsync({ length: 10 }),
                         prodName: data.productName,
                         unit: data.unit,
                         qty: {
@@ -1447,6 +1498,7 @@ const Counter = () => {
                     setFieldData([
                       ...fieldData,
                       {
+                        id: cryptoRandomStringAsync({ length: 10 }),
                         prodName: data.productName,
                         unit: data.unit,
                         qty: qtyPair,
@@ -1473,6 +1525,7 @@ const Counter = () => {
                     setFieldData([
                       ...fieldData,
                       {
+                        id: cryptoRandomStringAsync({ length: 10 }),
                         prodName: data.productName,
                         unit: data.unit,
                         qty: {
@@ -1535,7 +1588,10 @@ const Counter = () => {
             </button>
           </div>
         </div>
-        <div className={isPreview ? "modals d-flex" : "modals d-none"}>
+        <div
+          className={isPreview ? "modals d-flex" : "modals d-none"}
+          id="printthis"
+        >
           <div className="modal-bodys">
             <button
               className="modal-close"
@@ -1567,293 +1623,304 @@ const Counter = () => {
             <button
               className="modal-print"
               title="print"
-              onClick={() => setIsPreview(false)}
+              onClick={() => handlePrint()}
             >
               <FcPrint />
             </button>
-            <img className="logs" alt="logo" src={logo} />
-            <div className="reciept">
-              <h3>
-                BGI Electrical Contractors, Supplies and Manpower Services
-              </h3>
-              <p>
-                Maharlika Highway (across SORECO II NGCCP) Cabid-an Sorsogon
-                City
-              </p>
-              <p>(056) 311 4057</p>
+            <div ref={componentRef} className="print-container">
+              <img className="logs" alt="logo" src={logo} />
+              <div className="reciept">
+                <h3>
+                  BGI Electrical Contractors, Supplies and Manpower Services
+                </h3>
+                <p>
+                  Maharlika Highway (across SORECO II NGCCP) Cabid-an Sorsogon
+                  City
+                </p>
+                <p>(056) 311 4057</p>
 
-              <br />
+                <br />
 
-              <p>
-                Customer : <span>{customer}</span>
-              </p>
-              <p>
-                Date : <span>{moment().format("LLL")}</span>
-              </p>
-              <p>
-                Cashier : <span>Gina S</span>
-              </p>
-            </div>
-            <table className="ctbl tb2">
-              <thead className="">
-                <tr>
-                  <th>Product Name</th>
-                  <th>Qty</th>
-                  <th>Price</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {fieldData.map((f, k) => (
-                  <tr key={k}>
-                    <td>{f.prodName}</td>
-                    <td>
-                      {f.unit === unit.piece ? (
-                        `${f.qty} Pcs`
-                      ) : f.unit === unit.pack ? (
-                        <>
-                          {f.qty.pack > 0 && f.qty.pcs > 0
-                            ? `${f.qty.pack} Pack & ${f.qty.pcs} Pcs`
-                            : f.qty.pack > 0 && f.qty.pcs <= 0
-                            ? `${f.qty.pack} Pack`
-                            : `${f.qty.pcs} Pcs`}
-                        </>
-                      ) : f.unit === unit.box ? (
-                        <>
-                          {f.qty.box > 0 && f.qty.pcs > 0
-                            ? `${f.qty.box} Box & ${f.qty.pcs} Pcs`
-                            : f.qty.box > 0 && f.qty.pcs <= 0
-                            ? `${f.qty.box} Box`
-                            : `${f.qty.pcs} Pcs`}
-                        </>
-                      ) : f.unit === unit.roll ? (
-                        <>
-                          {f.qty.roll > 0 && f.qty.meter > 0
-                            ? `${f.qty.roll} Roll & ${f.qty.meter} Meter`
-                            : f.qty.roll > 0 && f.qty.meter <= 0
-                            ? `${f.qty.roll} Roll`
-                            : `${f.qty.meter} Meter`}
-                        </>
-                      ) : f.unit === unit.set ? (
-                        <>
-                          {f.qty.set > 0 && f.qty.pcs > 0
-                            ? `${f.qty.set} Set & ${f.qty.pcs} Pcs`
-                            : f.qty.set > 0 && f.qty.pcs <= 0
-                            ? `${f.qty.set} Set`
-                            : `${f.qty.pcs} Pcs`}
-                        </>
-                      ) : f.unit === unit.pair ? (
-                        `${f.qty} Pair`
-                      ) : f.unit === unit.bundle ? (
-                        <>
-                          {f.qty.bundle > 0 && f.qty.pcs > 0
-                            ? `${f.qty.bundle} Bundle & ${f.qty.pcs} Pcs`
-                            : f.qty.bundle > 0 && f.qty.pcs <= 0
-                            ? `${f.qty.bundle} Bundle`
-                            : `${f.qty.pcs} Pcs`}
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </td>
-                    <td>
-                      {f.unit === unit.piece ? (
-                        `₱${f.price.toLocaleString("en", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })} / Pcs`
-                      ) : f.unit === unit.pack ? (
-                        <>
-                          {f.qty.pack > 0 && f.qty.pcs > 0
-                            ? `₱${f.price.pack.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Pack & ₱${f.price.pcs.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Pcs`
-                            : f.qty.pack > 0 && f.qty.pcs <= 0
-                            ? `₱${f.price.pack.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Pack`
-                            : `₱${f.price.pcs.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Pcs`}
-                        </>
-                      ) : f.unit === unit.box ? (
-                        <>
-                          {f.qty.box > 0 && f.qty.pcs > 0
-                            ? `₱${f.price.box.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Box & ₱${f.price.pcs.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Pcs`
-                            : f.qty.box > 0 && f.qty.pcs <= 0
-                            ? `₱${f.price.box.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Box`
-                            : `₱${f.price.pcs.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Pcs`}
-                        </>
-                      ) : f.unit === unit.roll ? (
-                        <>
-                          {f.qty.roll > 0 && f.qty.meter > 0
-                            ? `₱${f.price.roll.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Roll & ₱${f.price.meter.toLocaleString(
-                                "en",
-                                {
+                <p>
+                  Customer : <span>{customer}</span>
+                </p>
+                <p>
+                  Date : <span>{moment().format("LLL")}</span>
+                </p>
+                <p>
+                  Cashier : <span>{user.fullName}</span>
+                </p>
+              </div>
+              <table className="ctbl tb2">
+                <thead className="">
+                  <tr>
+                    <th>Product Name</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fieldData.map((f, k) => (
+                    <tr key={k}>
+                      <td>{f.prodName}</td>
+                      <td>
+                        {f.unit === unit.piece ? (
+                          `${f.qty} Pcs`
+                        ) : f.unit === unit.pack ? (
+                          <>
+                            {f.qty.pack > 0 && f.qty.pcs > 0
+                              ? `${f.qty.pack} Pack & ${f.qty.pcs} Pcs`
+                              : f.qty.pack > 0 && f.qty.pcs <= 0
+                              ? `${f.qty.pack} Pack`
+                              : `${f.qty.pcs} Pcs`}
+                          </>
+                        ) : f.unit === unit.box ? (
+                          <>
+                            {f.qty.box > 0 && f.qty.pcs > 0
+                              ? `${f.qty.box} Box & ${f.qty.pcs} Pcs`
+                              : f.qty.box > 0 && f.qty.pcs <= 0
+                              ? `${f.qty.box} Box`
+                              : `${f.qty.pcs} Pcs`}
+                          </>
+                        ) : f.unit === unit.roll ? (
+                          <>
+                            {f.qty.roll > 0 && f.qty.meter > 0
+                              ? `${f.qty.roll} Roll & ${f.qty.meter} Meter`
+                              : f.qty.roll > 0 && f.qty.meter <= 0
+                              ? `${f.qty.roll} Roll`
+                              : `${f.qty.meter} Meter`}
+                          </>
+                        ) : f.unit === unit.set ? (
+                          <>
+                            {f.qty.set > 0 && f.qty.pcs > 0
+                              ? `${f.qty.set} Set & ${f.qty.pcs} Pcs`
+                              : f.qty.set > 0 && f.qty.pcs <= 0
+                              ? `${f.qty.set} Set`
+                              : `${f.qty.pcs} Pcs`}
+                          </>
+                        ) : f.unit === unit.pair ? (
+                          `${f.qty} Pair`
+                        ) : f.unit === unit.bundle ? (
+                          <>
+                            {f.qty.bundle > 0 && f.qty.pcs > 0
+                              ? `${f.qty.bundle} Bundle & ${f.qty.pcs} Pcs`
+                              : f.qty.bundle > 0 && f.qty.pcs <= 0
+                              ? `${f.qty.bundle} Bundle`
+                              : `${f.qty.pcs} Pcs`}
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td>
+                        {f.unit === unit.piece ? (
+                          `₱${f.price.toLocaleString("en", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })} / Pcs`
+                        ) : f.unit === unit.pack ? (
+                          <>
+                            {f.qty.pack > 0 && f.qty.pcs > 0
+                              ? `₱${f.price.pack.toLocaleString("en", {
                                   minimumFractionDigits: 2,
                                   maximumFractionDigits: 2,
-                                }
-                              )} / Meter`
-                            : f.qty.roll > 0 && f.qty.meter <= 0
-                            ? `₱${f.price.roll.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Roll`
-                            : `₱${f.price.meter.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Meter`}
-                        </>
-                      ) : f.unit === unit.set ? (
-                        <>
-                          {f.qty.set > 0 && f.qty.pcs > 0
-                            ? `₱${f.price.set.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Set & ₱${f.price.pcs.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Pcs`
-                            : f.qty.set > 0 && f.qty.pcs <= 0
-                            ? `₱${f.price.set.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Set`
-                            : `₱${f.price.pcs.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Pcs`}
-                        </>
-                      ) : f.unit === unit.pair ? (
-                        `₱${f.price.toLocaleString("en", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })} / Pair`
-                      ) : f.unit === unit.bundle ? (
-                        <>
-                          {f.qty.bundle > 0 && f.qty.pcs > 0
-                            ? `₱${f.price.bundle.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Bundle & ₱${f.price.pcs.toLocaleString(
-                                "en",
-                                {
+                                })} / Pack & ₱${f.price.pcs.toLocaleString(
+                                  "en",
+                                  {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }
+                                )} / Pcs`
+                              : f.qty.pack > 0 && f.qty.pcs <= 0
+                              ? `₱${f.price.pack.toLocaleString("en", {
                                   minimumFractionDigits: 2,
                                   maximumFractionDigits: 2,
-                                }
-                              )} / Pcs`
-                            : f.qty.bundle > 0 && f.qty.pcs <= 0
-                            ? `₱${f.price.bundle.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Bundle`
-                            : `₱${f.price.pcs.toLocaleString("en", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })} / Pcs`}
-                        </>
-                      ) : (
-                        ""
-                      )}
-                    </td>
+                                })} / Pack`
+                              : `₱${f.price.pcs.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Pcs`}
+                          </>
+                        ) : f.unit === unit.box ? (
+                          <>
+                            {f.qty.box > 0 && f.qty.pcs > 0
+                              ? `₱${f.price.box.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Box & ₱${f.price.pcs.toLocaleString(
+                                  "en",
+                                  {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }
+                                )} / Pcs`
+                              : f.qty.box > 0 && f.qty.pcs <= 0
+                              ? `₱${f.price.box.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Box`
+                              : `₱${f.price.pcs.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Pcs`}
+                          </>
+                        ) : f.unit === unit.roll ? (
+                          <>
+                            {f.qty.roll > 0 && f.qty.meter > 0
+                              ? `₱${f.price.roll.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Roll & ₱${f.price.meter.toLocaleString(
+                                  "en",
+                                  {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }
+                                )} / Meter`
+                              : f.qty.roll > 0 && f.qty.meter <= 0
+                              ? `₱${f.price.roll.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Roll`
+                              : `₱${f.price.meter.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Meter`}
+                          </>
+                        ) : f.unit === unit.set ? (
+                          <>
+                            {f.qty.set > 0 && f.qty.pcs > 0
+                              ? `₱${f.price.set.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Set & ₱${f.price.pcs.toLocaleString(
+                                  "en",
+                                  {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }
+                                )} / Pcs`
+                              : f.qty.set > 0 && f.qty.pcs <= 0
+                              ? `₱${f.price.set.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Set`
+                              : `₱${f.price.pcs.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Pcs`}
+                          </>
+                        ) : f.unit === unit.pair ? (
+                          `₱${f.price.toLocaleString("en", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })} / Pair`
+                        ) : f.unit === unit.bundle ? (
+                          <>
+                            {f.qty.bundle > 0 && f.qty.pcs > 0
+                              ? `₱${f.price.bundle.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Bundle & ₱${f.price.pcs.toLocaleString(
+                                  "en",
+                                  {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }
+                                )} / Pcs`
+                              : f.qty.bundle > 0 && f.qty.pcs <= 0
+                              ? `₱${f.price.bundle.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Bundle`
+                              : `₱${f.price.pcs.toLocaleString("en", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })} / Pcs`}
+                          </>
+                        ) : (
+                          ""
+                        )}
+                      </td>
+                      <td>
+                        ₱
+                        {f.total.toLocaleString("en", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot className="tfoot">
+                  <tr className="trss">
+                    <td></td>
+                    <td></td>
+                    <td>Subtotal :</td>
                     <td>
                       ₱
-                      {f.total.toLocaleString("en", {
+                      {total.toLocaleString("en", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-              <tfoot className="tfoot">
-                <tr className="trss">
-                  <td></td>
-                  <td></td>
-                  <td>Subtotal :</td>
-                  <td>
-                    ₱
-                    {total.toLocaleString("en", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                </tr>
-                <tr className="trs">
-                  <td></td>
-                  <td></td>
-                  <td>Discount {`(${discount}%)`} :</td>
-                  <td>
-                    ₱
-                    {totalDiscount.toLocaleString("en", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                </tr>
-                <tr className="trs">
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <b>Total :</b>
-                  </td>
-                  <td>
-                    <b>
+                  <tr className="trs">
+                    <td></td>
+                    <td></td>
+                    <td>Discount {`(${discount}%)`} :</td>
+                    <td>
                       ₱
-                      {totalAmmount.toLocaleString("en", {
+                      {totalDiscount.toLocaleString("en", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
-                    </b>
-                  </td>
-                </tr>
-                <tr className="trs">
-                  <td></td>
-                  <td></td>
-                  <td>Cash :</td>
-                  <td>
-                    ₱
-                    {cash.toLocaleString("en", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                </tr>
-                <tr className="trs">
-                  <td></td>
-                  <td></td>
-                  <td>Change :</td>
-                  <td>
-                    ₱
-                    {change.toLocaleString("en", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
+                    </td>
+                  </tr>
+                  <tr className="trs">
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <b>Total :</b>
+                    </td>
+                    <td>
+                      <b>
+                        ₱
+                        {totalAmmount.toLocaleString("en", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </b>
+                    </td>
+                  </tr>
+                  <tr className="trs">
+                    <td></td>
+                    <td></td>
+                    <td>Cash :</td>
+                    <td>
+                      ₱
+                      {parseInt(cash, 10).toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                  <tr className="trs">
+                    <td></td>
+                    <td></td>
+                    <td>Change :</td>
+                    <td>
+                      ₱
+                      {change.toLocaleString("en", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
           </div>
         </div>
       </div>

@@ -1,13 +1,14 @@
 import "../css/header.css";
 import { TbMenu2 } from "react-icons/tb";
-import user from "../images/user.png";
 import { FaPowerOff } from "react-icons/fa6";
 import { FaRegUserCircle } from "react-icons/fa";
 import { useContext } from "react";
 import { Datas } from "../../App";
+import { SideData } from "../Keeper";
 
 const Header = () => {
   const { setIsLogin, setRole } = useContext(Datas);
+  const { user } = useContext(SideData);
 
   let menuToggle = false;
   let optionToggle = true;
@@ -39,10 +40,10 @@ const Header = () => {
       </button>
       <button className="user-option" onClick={() => toglleOption()}>
         <div style={{ textAlign: "right" }}>
-          <h4>Mariano Garapon</h4>
+          <h4>{user.fullName}</h4>
           <small>Keeper</small>
         </div>
-        <img alt="user" src={user} />
+        <img alt="user" src={user.avatar} />
       </button>
       <div className="user-option-body" id="uob">
         <button>

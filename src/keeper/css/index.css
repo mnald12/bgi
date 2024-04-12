@@ -178,3 +178,7 @@ table td button:hover {
 .w-25 {
   width: 25%;
 }
+
+.sale {
+  max-width: 800px;
+}

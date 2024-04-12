@@ -56,21 +56,26 @@ const Sidebar = () => {
         </button>
         <div className="divider">
           <div className="line"></div>
-          <h5>System</h5>
+          <h5>Accounts</h5>
         </div>
         <button
-          className={sideActive === "accounts" ? "active" : ""}
-          onClick={() => setSideActive("accounts")}
+          className={sideActive === "myprofile" ? "active" : ""}
+          onClick={() => setSideActive("myprofile")}
         >
           <IoPerson className="icn" />
-          Accounts
+          My Profile
         </button>
-        {/* <button
-          className={sideActive === "settings" ? "active" : ""}
-          onClick={() => setSideActive("settings")}
+        <button
+          className={sideActive === "keeperprofile" ? "active" : ""}
+          onClick={() => setSideActive("keeperprofile")}
         >
-          <TbAdjustmentsCancel className="icn" /> Settings
-        </button> */}
+          <IoPerson className="icn" />
+          Keeper
+        </button>
+        <div className="divider">
+          <div className="line"></div>
+          <h5>System</h5>
+        </div>
         <button
           className={sideActive === "help" ? "active" : ""}
           onClick={() => setSideActive("help")}
