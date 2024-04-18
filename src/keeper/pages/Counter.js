@@ -537,10 +537,8 @@ const Counter = () => {
       const catSnap = await getDoc(catRefs);
       const currentCat = catSnap.data();
 
-      const ns = (currentCat.sales += i.total);
-
       await updateDoc(doc(db, "categories", i.catId), {
-        sales: ns,
+        sales: currentCat.sales + i.total,
       });
 
       newSalesData.push(i);
@@ -1034,6 +1032,7 @@ const Counter = () => {
           <div id="btnlists">
             {products.map((prd, id) => (
               <button
+                className={prd.isArchived ? "d-none" : ""}
                 key={id}
                 onClick={() => {
                   add(prd);
@@ -1511,7 +1510,7 @@ const Counter = () => {
                       ...sales,
                       {
                         prodId: data.id,
-                        prodName: data.productName,
+                        productName: data.productName,
                         unit: data.unit,
                         catId: data.categoryId,
                         qty: qtyPair,
@@ -1550,7 +1549,7 @@ const Counter = () => {
                       ...sales,
                       {
                         prodId: data.id,
-                        prodName: data.productName,
+                        productName: data.productName,
                         unit: data.unit,
                         catId: data.categoryId,
                         qty: {

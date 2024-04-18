@@ -27,21 +27,19 @@ let data;
 const get = async () => {
   const q = query(collection(db, "categories"), orderBy("name"));
   const querySnapshot = await getDocs(q);
-  if (querySnapshot) {
-    const cats = querySnapshot.docs.map((doc) => {
-      return { id: doc.id, ...doc.data() };
-    });
-    data = {
-      labels: mapLabel(cats),
-      datasets: [
-        {
-          label: "Sales",
-          data: mapSale(cats),
-          backgroundColor: "midnightblue",
-        },
-      ],
-    };
-  }
+  const cats = querySnapshot.docs.map((doc) => {
+    return { id: doc.id, ...doc.data() };
+  });
+  data = {
+    labels: mapLabel(cats),
+    datasets: [
+      {
+        label: "Sales",
+        data: mapSale(cats),
+        backgroundColor: "midnightblue",
+      },
+    ],
+  };
 };
 
 get();

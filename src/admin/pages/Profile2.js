@@ -9,7 +9,7 @@ import { cryptoRandomStringAsync } from "crypto-random-string";
 
 const Profile = () => {
   const [isLoaded, setIsloaded] = useState(false);
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState({});
   const [isUpModal, setIsUpModal] = useState(false);
   const [isUpPassModal, setIsUpPassModal] = useState(false);
   const [uname, setUname] = useState("");
@@ -131,36 +131,38 @@ const Profile = () => {
             </div>
             <div className="profile-right">
               <table>
-                <tr>
-                  <td width="25%">
-                    <b>Username :</b>
-                  </td>
-                  <td width="80%">{profile.username}</td>
-                </tr>
-                <tr>
-                  <td width="25%">
-                    <b>Name :</b>
-                  </td>
-                  <td width="80%">{profile.fullName}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <b>Address : </b>
-                  </td>
-                  <td>{profile.address}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <b>Email : </b>
-                  </td>
-                  <td>{profile.email}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <b>Phone Number : </b>
-                  </td>
-                  <td>{profile.number}</td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td width="25%">
+                      <b>Username :</b>
+                    </td>
+                    <td width="80%">{profile.username}</td>
+                  </tr>
+                  <tr>
+                    <td width="25%">
+                      <b>Name :</b>
+                    </td>
+                    <td width="80%">{profile.fullName}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Address : </b>
+                    </td>
+                    <td>{profile.address}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Email : </b>
+                    </td>
+                    <td>{profile.email}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Phone Number : </b>
+                    </td>
+                    <td>{profile.number}</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -176,7 +178,7 @@ const Profile = () => {
                 <div className="img-preview">
                   <img id="img" alt="logo" src={profile.avatar} />
                 </div>
-                <p>Product Image</p>
+                <p>Profile Image</p>
                 <input
                   type="file"
                   id="imgs"

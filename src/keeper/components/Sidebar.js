@@ -3,6 +3,7 @@ import logo from "../images/logo.png";
 import { BiSolidDashboard } from "react-icons/bi";
 import { IoPerson } from "react-icons/io5";
 import { BsCalculatorFill, BsFillBoxFill } from "react-icons/bs";
+import { HiInboxArrowDown } from "react-icons/hi2";
 import { FaPesoSign } from "react-icons/fa6";
 import { TbHelpHexagonFilled } from "react-icons/tb";
 import { useContext } from "react";
@@ -51,6 +52,13 @@ const Sidebar = () => {
           <FaPesoSign className="icn" />
           Sales
         </button>
+        <button
+          className={sideActive === "return" ? "active" : ""}
+          onClick={() => setSideActive("return")}
+        >
+          <HiInboxArrowDown className="icn" />
+          Return
+        </button>
         <div className="divider">
           <div className="line"></div>
           <h5>Accounts</h5>
@@ -61,16 +69,6 @@ const Sidebar = () => {
         >
           <IoPerson className="icn" />
           My Profile
-        </button>
-        <div className="divider">
-          <div className="line"></div>
-          <h5>System</h5>
-        </div>
-        <button
-          className={sideActive === "help" ? "active" : ""}
-          onClick={() => setSideActive("help")}
-        >
-          <TbHelpHexagonFilled className="icn" /> Help
         </button>
       </div>
     </div>

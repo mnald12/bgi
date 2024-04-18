@@ -10,6 +10,7 @@ import Sales from "./pages/Sales";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../db/config";
 import Profile from "./pages/Profile";
+import Return from "./pages/Return";
 Chart.register(...registerables);
 
 const SideData = createContext(null);
@@ -29,6 +30,8 @@ const Keeper = () => {
       return <Products />;
     } else if (sideActive === "sales") {
       return <Sales />;
+    } else if (sideActive === "return") {
+      return <Return />;
     } else if (sideActive === "profile") {
       return <Profile />;
     }

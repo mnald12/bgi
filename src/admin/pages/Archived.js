@@ -2,12 +2,24 @@ import { useEffect, useState } from "react";
 import "../css/products.css";
 import "../css/modal.css";
 import Loader from "../components/Loader";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../../db/config";
+import { GrRevert } from "react-icons/gr";
+import { RiCloseLine } from "react-icons/ri";
+import { LuArchiveRestore } from "react-icons/lu";
 
-const Products = () => {
+const Archived = () => {
   const [isLoaded, setIsloaded] = useState(false);
   const [products, setProducts] = useState([]);
+  const [isModal, setIsModal] = useState(false);
+  const [prdId, setPrdId] = useState("");
 
   const unit = {
     piece: "Piece",
@@ -35,6 +47,14 @@ const Products = () => {
     }, 1000);
   }, []);
 
+  const revert = async (id) => {
+    setIsModal(false);
+    setProducts((l) => l.filter((item) => item.id !== id));
+    await updateDoc(doc(db, "products", id), {
+      isArchived: false,
+    });
+  };
+
   const searchTable = (e) => {
     const lists = document.getElementById("tbody").querySelectorAll("tr");
     const textToSearch = e.target.value.toUpperCase();
@@ -49,7 +69,7 @@ const Products = () => {
     return (
       <div className="products">
         <div className="page-header">
-          <h3 className="page-title">Products</h3>
+          <h3 className="page-title">Archives</h3>
           <div className="search-bars">
             <input
               type="search"
@@ -68,11 +88,12 @@ const Products = () => {
               <th>Unit</th>
               <th>Price</th>
               <th>Stocks</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="tbody">
             {products.map((prod, id) => (
-              <tr key={id} className={prod.isArchived ? "d-none" : ""}>
+              <tr key={id} className={prod.isArchived ? "" : "d-none"}>
                 <td>
                   <img src={prod.productImage} alt="prod" />
                 </td>
@@ -220,10 +241,43 @@ const Products = () => {
                 ) : (
                   <td>{prod.stocks} Pcs</td>
                 )}
+                <td className="btn-flex">
+                  <button
+                    className="view"
+                    title="revert"
+                    onClick={() => {
+                      setIsModal(true);
+                      setPrdId(prod.id);
+                    }}
+                  >
+                    <GrRevert />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+        <div className={isModal ? "modal d-flex" : "modal d-none"}>
+          <div className="modal-body-delete">
+            <button className="modal-close" onClick={() => setIsModal(false)}>
+              <RiCloseLine />
+            </button>
+            <div className="text-center">
+              <LuArchiveRestore className="icn" color="orange" />
+            </div>
+            <h3>Do you want to revert this product?</h3>
+            <p>
+              This action will restore the product to the product list, making
+              it visible and accessible
+            </p>
+            <button className="dbtns delete" onClick={() => revert(prdId)}>
+              Revert
+            </button>
+            <button className="dbtns cancel" onClick={() => setIsModal(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
       </div>
     );
   } else {
@@ -231,4 +285,4 @@ const Products = () => {
   }
 };
 
-export default Products;
+export default Archived;

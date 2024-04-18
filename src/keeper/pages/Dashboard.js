@@ -1,15 +1,35 @@
 import "../css/dashboard.css";
 import growth from "../images/growth.png";
-import LineChart from "../hooks/Lines";
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../../db/config";
 import moment from "moment/moment";
+import { Line } from "react-chartjs-2";
 
 const options = {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
+};
+
+const lineOptions = {
+  scales: {
+    x: {
+      display: true,
+      title: {
+        display: true,
+        text: "Weekly sales",
+      },
+    },
+    y: {
+      display: true,
+      title: {
+        display: true,
+        text: "Value",
+      },
+    },
+  },
+  maintainAspectRatio: false,
 };
 
 const fn = (n) => {
@@ -17,7 +37,7 @@ const fn = (n) => {
 };
 
 const checkDiff = (n1, n2) => {
-  const p = 100 * Math.abs((n1 - n2) / ((n1 + n2) / 2)).toFixed(2);
+  const p = Math.round(100 * Math.abs((n1 - n2) / ((n1 + n2) / 2)).toFixed(2));
   if (p > 100) return p - 100;
   else return p;
 };
@@ -31,6 +51,8 @@ const Dashboard = () => {
   const [lastMonthsSales, setLastMonthsSales] = useState(0);
   const [thisYearSales, setThisYearSales] = useState(0);
   const [lastYearSales, setLastYearSales] = useState(0);
+
+  const [lineDatas, setLineDatas] = useState({});
 
   useEffect(() => {
     const getSales = async () => {
@@ -89,6 +111,63 @@ const Dashboard = () => {
     };
 
     getSales();
+
+    const setLines = async () => {
+      let mon = moment().weekday(1)._d.getDate();
+      let tue = moment().weekday(2)._d.getDate();
+      let wed = moment().weekday(3)._d.getDate();
+      let thu = moment().weekday(4)._d.getDate();
+      let Fri = moment().weekday(5)._d.getDate();
+      let Sat = moment().weekday(6)._d.getDate();
+      let sun = moment().weekday(7)._d.getDate();
+
+      const q = query(collection(db, "sales"));
+      const querySnapshot = await getDocs(q);
+      const sales = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+
+      const lineData = {
+        labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        datasets: [
+          {
+            label: "Sales",
+            data: [0, 0, 0, 0, 0, 0, 0],
+            borderColor: "rgba(75, 192, 192, 1)",
+            fill: false,
+            tension: 0.6,
+          },
+        ],
+      };
+
+      for (let i of sales) {
+        if (i.dates.day === sun) {
+          lineData.datasets[0].data[0] += i.sales;
+        }
+        if (i.dates.day === mon) {
+          lineData.datasets[0].data[1] += i.sales;
+        }
+        if (i.dates.day === tue) {
+          lineData.datasets[0].data[2] += i.sales;
+        }
+        if (i.dates.day === wed) {
+          lineData.datasets[0].data[3] += i.sales;
+        }
+        if (i.dates.day === thu) {
+          lineData.datasets[0].data[4] += i.sales;
+        }
+        if (i.dates.day === Fri) {
+          lineData.datasets[0].data[5] += i.sales;
+        }
+        if (i.dates.day === Sat) {
+          lineData.datasets[0].data[6] += i.sales;
+        }
+      }
+
+      setLineDatas(lineData);
+    };
+
+    setLines();
 
     setTimeout(() => {
       setIsloaded(true);
@@ -166,7 +245,7 @@ const Dashboard = () => {
             height: "100%",
           }}
         >
-          <LineChart />
+          <Line height={300} data={lineDatas} options={lineOptions} />
         </div>
       </div>
     );

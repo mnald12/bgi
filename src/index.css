@@ -20,6 +20,11 @@ body {
 button {
   cursor: pointer;
 }
+button:disabled,
+button[disabled] {
+  opacity: 0.5;
+}
+
 .text-right {
   text-align: right;
 }
@@ -39,6 +44,10 @@ button {
 
 .p-8px {
   padding: 8px;
+}
+
+.gap-10px {
+  gap: 10px;
 }
 
 @media print {

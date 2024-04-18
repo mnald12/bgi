@@ -2,13 +2,12 @@ import "../css/dashboard.css";
 import growth from "../images/growth.png";
 import profit from "../images/profit.png";
 import caps from "../images/capital.png";
-import LineChart from "../hooks/Lines";
-import BarChart from "../hooks/BarChart";
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../../db/config";
 import moment from "moment/moment";
+import { Bar, Line } from "react-chartjs-2";
 
 const options = {
   minimumFractionDigits: 2,
@@ -20,9 +19,49 @@ const fn = (n) => {
 };
 
 const checkDiff = (n1, n2) => {
-  const p = 100 * Math.abs((n1 - n2) / ((n1 + n2) / 2)).toFixed(2);
+  const p = Math.round(100 * Math.abs((n1 - n2) / ((n1 + n2) / 2)).toFixed(2));
   if (p > 100) return p - 100;
   else return p;
+};
+
+const mapLabel = (arr) => {
+  const newArray = [];
+
+  for (let i of arr) {
+    newArray.push(i.name);
+  }
+
+  return newArray;
+};
+
+const mapSale = (arr) => {
+  const newArray = [];
+
+  for (let i of arr) {
+    newArray.push(i.sales);
+  }
+
+  return newArray;
+};
+
+const lineOptions = {
+  scales: {
+    x: {
+      display: true,
+      title: {
+        display: true,
+        text: "Weekly sales",
+      },
+    },
+    y: {
+      display: true,
+      title: {
+        display: true,
+        text: "Value",
+      },
+    },
+  },
+  maintainAspectRatio: false,
 };
 
 const Dashboard = () => {
@@ -46,6 +85,9 @@ const Dashboard = () => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalCapital, setTotalCapital] = useState(0);
 
+  const [barData, setBarData] = useState({});
+  const [lineDatas, setLineDatas] = useState({});
+
   useEffect(() => {
     const getPs = async () => {
       const q = query(collection(db, "products"));
@@ -55,18 +97,12 @@ const Dashboard = () => {
       });
 
       let tc = 0;
-      let ts = 0;
-      let ti = 0;
 
       for (let i of prods) {
         tc += i.totalCapital;
-        ts += i.sales;
-        ti += i.income;
       }
 
       setTotalCapital(tc);
-      setTotalSales(ts);
-      setTotalIncome(ti);
     };
 
     getPs();
@@ -100,7 +136,13 @@ const Dashboard = () => {
       let tyi = 0;
       let lyi = 0;
 
+      let tfs = 0;
+      let tfi = 0;
+
       for (let i of sales) {
+        tfs += i.sales;
+        tfi += i.income;
+
         if (i.dates.year === y && i.dates.month === m && i.dates.day === d) {
           ts += i.sales;
           ti += i.income;
@@ -145,9 +187,104 @@ const Dashboard = () => {
       setLastMonthsIncome(lmi);
       setThisYearIncome(tyi);
       setLastYearIncome(lyi);
+
+      setTotalSales(tfs);
+      setTotalIncome(tfi);
     };
 
     getSales();
+
+    const getCats = async () => {
+      const q = query(collection(db, "categories"));
+      const querySnapshot = await getDocs(q);
+      const cats = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+      const bdata = {
+        labels: mapLabel(cats),
+        datasets: [
+          {
+            label: "Sales",
+            data: mapSale(cats),
+            backgroundColor: "midnightblue",
+          },
+        ],
+      };
+      setBarData(bdata);
+    };
+
+    getCats();
+
+    const setLines = async () => {
+      let mon = moment().weekday(1)._d.getDate();
+      let tue = moment().weekday(2)._d.getDate();
+      let wed = moment().weekday(3)._d.getDate();
+      let thu = moment().weekday(4)._d.getDate();
+      let Fri = moment().weekday(5)._d.getDate();
+      let Sat = moment().weekday(6)._d.getDate();
+      let sun = moment().weekday(7)._d.getDate();
+
+      const q = query(collection(db, "sales"));
+      const querySnapshot = await getDocs(q);
+      const sales = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+
+      const lineData = {
+        labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        datasets: [
+          {
+            label: "Sales",
+            data: [0, 0, 0, 0, 0, 0, 0],
+            borderColor: "rgba(75, 192, 192, 1)",
+            fill: false,
+            tension: 0.6,
+          },
+          {
+            label: "Income",
+            data: [0, 0, 0, 0, 0, 0, 0],
+            borderColor: "rgba(255, 159, 64, 1)",
+            fill: false,
+            tension: 0.6,
+          },
+        ],
+      };
+
+      for (let i of sales) {
+        if (i.dates.day === sun) {
+          lineData.datasets[0].data[0] += i.sales;
+          lineData.datasets[1].data[0] += i.income;
+        }
+        if (i.dates.day === mon) {
+          lineData.datasets[0].data[1] += i.sales;
+          lineData.datasets[1].data[1] += i.income;
+        }
+        if (i.dates.day === tue) {
+          lineData.datasets[0].data[2] += i.sales;
+          lineData.datasets[1].data[2] += i.income;
+        }
+        if (i.dates.day === wed) {
+          lineData.datasets[0].data[3] += i.sales;
+          lineData.datasets[1].data[3] += i.income;
+        }
+        if (i.dates.day === thu) {
+          lineData.datasets[0].data[4] += i.sales;
+          lineData.datasets[1].data[4] += i.income;
+        }
+        if (i.dates.day === Fri) {
+          lineData.datasets[0].data[5] += i.sales;
+          lineData.datasets[1].data[5] += i.income;
+        }
+        if (i.dates.day === Sat) {
+          lineData.datasets[0].data[6] += i.sales;
+          lineData.datasets[1].data[6] += i.income;
+        }
+      }
+
+      setLineDatas(lineData);
+    };
+
+    setLines();
 
     setTimeout(() => {
       setIsloaded(true);
@@ -328,7 +465,7 @@ const Dashboard = () => {
             height: "100%",
           }}
         >
-          <LineChart />
+          <Line height={300} data={lineDatas} options={lineOptions} />
         </div>
         <div
           style={{
@@ -338,7 +475,11 @@ const Dashboard = () => {
             height: "100%",
           }}
         >
-          <BarChart />
+          <Bar
+            height={300}
+            data={barData}
+            options={{ maintainAspectRatio: false }}
+          />
         </div>
       </div>
     );

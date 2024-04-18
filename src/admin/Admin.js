@@ -7,13 +7,14 @@ import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import Products from "./pages/Products";
 import Sales from "./pages/Sales";
-import Help from "./pages/Help";
 import Product from "./pages/Product";
 import Sale from "./pages/Sale";
 import Profile from "./pages/Profile";
 import Profile2 from "./pages/Profile2";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../db/config";
+import Archived from "./pages/Archived";
+import Return from "./pages/Return";
 Chart.register(...registerables);
 
 const SideData = createContext(null);
@@ -50,8 +51,10 @@ const Admin = () => {
       return <Profile />;
     } else if (sideActive === "keeperprofile") {
       return <Profile2 />;
-    } else if (sideActive === "help") {
-      return <Help />;
+    } else if (sideActive === "archived") {
+      return <Archived />;
+    } else if (sideActive === "returns") {
+      return <Return />;
     }
   };
 

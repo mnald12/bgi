@@ -1191,7 +1191,7 @@ const Products = () => {
                       />
                     </div>
                     <div className="input-group w-30">
-                      <label>Qty Pcs Per Pack</label>
+                      <label>Pcs Per Pack</label>
                       <input
                         type="number"
                         value={pcsPerPack}
@@ -1253,7 +1253,7 @@ const Products = () => {
                       />
                     </div>
                     <div className="input-group w-30">
-                      <label>Qty Pcs Per Box</label>
+                      <label>Pcs Per Box</label>
                       <input
                         type="number"
                         value={pcsPerBox}
@@ -1315,7 +1315,7 @@ const Products = () => {
                       />
                     </div>
                     <div className="input-group w-30">
-                      <label>Qty Meter Per Roll</label>
+                      <label>Meter Per Roll</label>
                       <input
                         type="number"
                         value={meterPerRoll}
@@ -1377,7 +1377,7 @@ const Products = () => {
                       />
                     </div>
                     <div className="input-group w-30">
-                      <label>Qty Piece Per Set</label>
+                      <label>Pcs Per Set</label>
                       <input
                         type="number"
                         value={pcsPerSet}
@@ -1476,7 +1476,7 @@ const Products = () => {
                       />
                     </div>
                     <div className="input-group w-30">
-                      <label>Qty Piece Per Bundle</label>
+                      <label>Pcs Per Bundle</label>
                       <input
                         type="number"
                         value={pcsPerBundle}

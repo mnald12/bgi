@@ -6,8 +6,8 @@ import { BiSolidCategoryAlt } from "react-icons/bi";
 import { IoPerson } from "react-icons/io5";
 import { BsFillBoxFill } from "react-icons/bs";
 import { FaPesoSign } from "react-icons/fa6";
-import { TbHelpHexagonFilled } from "react-icons/tb";
-
+import { HiInboxArrowDown } from "react-icons/hi2";
+import { IoArchive } from "react-icons/io5";
 import { useContext } from "react";
 import { SideData } from "../Admin";
 
@@ -54,6 +54,20 @@ const Sidebar = () => {
           <FaPesoSign className="icn" />
           Sales
         </button>
+        <button
+          className={sideActive === "returns" ? "active" : ""}
+          onClick={() => setSideActive("returns")}
+        >
+          <HiInboxArrowDown className="icn" />
+          Return
+        </button>
+        <button
+          className={sideActive === "archived" ? "active" : ""}
+          onClick={() => setSideActive("archived")}
+        >
+          <IoArchive className="icn" />
+          Archives
+        </button>
         <div className="divider">
           <div className="line"></div>
           <h5>Accounts</h5>
@@ -71,16 +85,6 @@ const Sidebar = () => {
         >
           <IoPerson className="icn" />
           Keeper
-        </button>
-        <div className="divider">
-          <div className="line"></div>
-          <h5>System</h5>
-        </div>
-        <button
-          className={sideActive === "help" ? "active" : ""}
-          onClick={() => setSideActive("help")}
-        >
-          <TbHelpHexagonFilled className="icn" /> Help
         </button>
       </div>
     </div>

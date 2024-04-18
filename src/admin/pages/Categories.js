@@ -30,12 +30,10 @@ const Categories = () => {
     const get = async () => {
       const q = query(collection(db, "categories"), orderBy("name"));
       const querySnapshot = await getDocs(q);
-      if (querySnapshot) {
-        const cats = querySnapshot.docs.map((doc) => {
-          return { id: doc.id, ...doc.data() };
-        });
-        setCategories(cats);
-      }
+      const cats = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+      setCategories(cats);
     };
     get();
     setTimeout(() => {
@@ -70,12 +68,10 @@ const Categories = () => {
     });
     const q = query(collection(db, "categories"), orderBy("name"));
     const querySnapshot = await getDocs(q);
-    if (querySnapshot) {
-      const cats = querySnapshot.docs.map((doc) => {
-        return { id: doc.id, ...doc.data() };
-      });
-      setCategories(cats);
-    }
+    const cats = querySnapshot.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() };
+    });
+    setCategories(cats);
     setIsUpModal(false);
   };
 

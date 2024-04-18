@@ -12,15 +12,12 @@ const Profile = () => {
   const [isLoaded, setIsloaded] = useState(false);
   const [profile, setProfile] = useState(null);
   const [isUpModal, setIsUpModal] = useState(false);
-  //   const [isUpPassModal, setIsUpPassModal] = useState(false);
   const [uname, setUname] = useState("");
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [number, setNumber] = useState("");
   const [img, setImg] = useState("");
-  //   const [pwd, setPwd] = useState("");
-  //   const [rpwd, setRpwd] = useState("");
 
   useEffect(() => {
     const getProd = async () => {
@@ -82,26 +79,6 @@ const Profile = () => {
     setIsloaded(true);
   };
 
-  //   const updatePwd = async () => {
-  //     if (pwd !== rpwd) {
-  //       document.getElementById("rpwdtxt").classList.remove("d-none");
-  //       setTimeout(() => {
-  //         document.getElementById("rpwdtxt").classList.add("d-none");
-  //       }, 2000);
-  //       return;
-  //     }
-  //     if (pwd !== "") {
-  //       setIsloaded(false);
-  //       await updateDoc(doc(db, "users", "keeper"), {
-  //         password: pwd,
-  //       });
-  //       setPwd("");
-  //       setRpwd("");
-  //       setIsUpPassModal(false);
-  //       setIsloaded(true);
-  //     }
-  //   };
-
   if (isLoaded) {
     return (
       <>
@@ -109,14 +86,6 @@ const Profile = () => {
           <div className="page-header">
             <h3 className="page-title">My Profile</h3>
             <div className="search-bars">
-              {/* <button
-                className="add-bar"
-                onClick={() => {
-                  setIsUpPassModal(true);
-                }}
-              >
-                Change password
-              </button> */}
               <button
                 className="add-bar bg-orange"
                 onClick={() => {
@@ -133,36 +102,32 @@ const Profile = () => {
             </div>
             <div className="profile-right">
               <table>
-                {/* <tr>
-                  <td width="25%">
-                    <b>Username :</b>
-                  </td>
-                  <td width="80%">{profile.username}</td>
-                </tr> */}
-                <tr>
-                  <td width="25%">
-                    <b>Name :</b>
-                  </td>
-                  <td width="80%">{profile.fullName}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <b>Address : </b>
-                  </td>
-                  <td>{profile.address}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <b>Email : </b>
-                  </td>
-                  <td>{profile.email}</td>
-                </tr>
-                <tr>
-                  <td>
-                    <b>Phone Number : </b>
-                  </td>
-                  <td>{profile.number}</td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td width="25%">
+                      <b>Name :</b>
+                    </td>
+                    <td width="80%">{profile.fullName}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Address : </b>
+                    </td>
+                    <td>{profile.address}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Email : </b>
+                    </td>
+                    <td>{profile.email}</td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Phone Number : </b>
+                    </td>
+                    <td>{profile.number}</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
           </div>

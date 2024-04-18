@@ -34,13 +34,11 @@ const Sales = () => {
     const get = async () => {
       const q = query(collection(db, "sales"), orderBy("date"));
       const querySnapshot = await getDocs(q);
-      if (querySnapshot) {
-        const sales = querySnapshot.docs.map((doc) => {
-          return { id: doc.id, ...doc.data() };
-        });
-        setSales(sales);
-        setPrevData(sales[0]);
-      }
+      const sales = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+      setSales(sales);
+      setPrevData(sales[0]);
     };
     get();
     setTimeout(() => {

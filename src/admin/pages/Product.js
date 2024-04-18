@@ -989,6 +989,12 @@ const Product = () => {
                   </tr>
                   <tr>
                     <td>
+                      <b>Pcs Per Pack</b>
+                    </td>
+                    <td>{product.pcsPerPack} Pcs</td>
+                  </tr>
+                  <tr>
+                    <td>
                       <b>Total Capital</b>
                     </td>
                     <td>
@@ -1080,6 +1086,12 @@ const Product = () => {
                     <td>
                       {product.stocks.box} Box and {product.stocks.pcs} Pcs
                     </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Pcs Per Box</b>
+                    </td>
+                    <td>{product.pcsPerBox} Pcs</td>
                   </tr>
                   <tr>
                     <td>
@@ -1178,6 +1190,12 @@ const Product = () => {
                   </tr>
                   <tr>
                     <td>
+                      <b>Meter Per Roll</b>
+                    </td>
+                    <td>{product.meterPerRoll} Meter</td>
+                  </tr>
+                  <tr>
+                    <td>
                       <b>Total Capital</b>
                     </td>
                     <td>
@@ -1269,6 +1287,12 @@ const Product = () => {
                     <td>
                       {product.stocks.set} Set and {product.stocks.pcs} Pcs
                     </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Pcs Per Set</b>
+                    </td>
+                    <td>{product.pcsPerSet} Pcs</td>
                   </tr>
                   <tr>
                     <td>
@@ -1445,6 +1469,12 @@ const Product = () => {
                       {product.stocks.bundle} Bundle and {product.stocks.pcs}{" "}
                       Pcs
                     </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Pcs Per Bundle</b>
+                    </td>
+                    <td>{product.pcsPerBundle} Pcs</td>
                   </tr>
                   <tr>
                     <td>
