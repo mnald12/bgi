@@ -35,7 +35,7 @@ const Header = () => {
         <div className="user-option">
           <div className="user-texts">
             <h4>{user.fullName}</h4>
-            <p>Admin</p>
+            <p>Keeper</p>
           </div>
           <img alt="user" src={user.avatar} />
         </div>
