@@ -95,9 +95,85 @@ const Counter = () => {
     return opts;
   };
 
+  const [isOutOfStocks, setIsOutOfStocks] = useState(false);
+
   const add = (data) => {
+    const stck = data.stocks;
+    switch (data.unit) {
+      case "Piece":
+        if (stck > 0) {
+          setIsOutOfStocks(false);
+        } else {
+          setIsOutOfStocks(true);
+        }
+        break;
+      case "Pack":
+        if (stck.pack > 0 || stck.pcs > 0) {
+          setIsOutOfStocks(false);
+        } else {
+          setIsOutOfStocks(true);
+        }
+        break;
+      case "Box":
+        if (stck.box > 0 || stck.pcs > 0) {
+          setIsOutOfStocks(false);
+        } else {
+          setIsOutOfStocks(true);
+        }
+        break;
+      case "Roll":
+        if (stck.roll > 0 || stck.meter > 0) {
+          setIsOutOfStocks(false);
+        } else {
+          setIsOutOfStocks(true);
+        }
+        break;
+      case "Set":
+        if (stck.set > 0 || stck.pcs > 0) {
+          setIsOutOfStocks(false);
+        } else {
+          setIsOutOfStocks(true);
+        }
+        break;
+      case "Pair":
+        if (stck > 0) {
+          setIsOutOfStocks(false);
+        } else {
+          setIsOutOfStocks(true);
+        }
+        break;
+      case "Bundle":
+        if (stck.bundle > 0 || stck.pcs > 0) {
+          setIsOutOfStocks(false);
+        } else {
+          setIsOutOfStocks(true);
+        }
+        break;
+      default:
+        setIsOutOfStocks(false);
+        break;
+    }
     setData(data);
     setIsModal(true);
+  };
+
+  const [isDiscount, setIsDiscount] = useState(false);
+  const [isDiscountModal, setIsDiscountModal] = useState(false);
+  const [disPwd, setDisPwd] = useState("");
+
+  const setDiscountPwd = async () => {
+    const docSnap = await getDoc(doc(db, "users", "discount_pwd"));
+    const d = docSnap.data();
+    if (disPwd === d.password) {
+      setIsDiscount(true);
+      setIsDiscountModal(false);
+    } else {
+      setDisPwd("");
+      document.getElementById("discheck").classList.remove("d-none");
+      setTimeout(() => {
+        document.getElementById("discheck").classList.add("d-none");
+      }, 2000);
+    }
   };
 
   useEffect(() => {
@@ -668,14 +744,23 @@ const Counter = () => {
               <div className="d-flexs">
                 <div className="input-groups w-50">
                   <label>Discount</label>
-                  <Select
-                    options={discountPercent()}
-                    defaultValue={qtyPiece}
-                    onChange={(e) => {
-                      setDiscount(e.value);
-                      setTotalDiscount((e.value / 100) * total);
-                    }}
-                  />
+                  {isDiscount ? (
+                    <Select
+                      options={discountPercent()}
+                      defaultValue={qtyPiece}
+                      onChange={(e) => {
+                        setDiscount(e.value);
+                        setTotalDiscount((e.value / 100) * total);
+                      }}
+                    />
+                  ) : (
+                    <button
+                      className="dicount-btn"
+                      onClick={() => setIsDiscountModal(true)}
+                    >
+                      Click here to enter password
+                    </button>
+                  )}
                 </div>
 
                 <div className="input-group w-50">
@@ -1104,177 +1189,184 @@ const Counter = () => {
                     </tr>
                   </tbody>
                 </table>
-                {data.unit === unit.piece ? (
-                  <div className="counter-select-field">
-                    <div className="field-form">
-                      <label>Qty Pcs to sell : </label>
-                      <Select
-                        className="selects"
-                        options={options(data.stocks, "Pcs")}
-                        defaultValue={qtyPiece}
-                        onChange={(e) => setQtyPiece(e.value)}
-                      />
-                    </div>
-                  </div>
-                ) : data.unit === unit.pack ? (
-                  <>
-                    <div className="counter-select-field">
-                      <div className="field-form">
-                        <label>Qty pack to sell : </label>
-                        <Select
-                          className="selects"
-                          options={options(data.stocks.pack, "Pack")}
-                          defaultValue={qtyPack}
-                          onChange={(e) => setQtyPack(e.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="counter-select-field mt-2">
-                      <div className="field-form">
-                        <label>Qty Pcs to sell : </label>
-                        <Select
-                          className="selects"
-                          options={
-                            data.stocks.pack > 0
-                              ? options2(data.pcsPerPack, "Pcs")
-                              : options2(data.stocks.pcs, "Pcs")
-                          }
-                          defaultValue={qtyPackPcs}
-                          onChange={(e) => setQtyPackPcs(e.value)}
-                        />
-                      </div>
-                    </div>
-                  </>
-                ) : data.unit === unit.box ? (
-                  <>
-                    <div className="counter-select-field">
-                      <div className="field-form">
-                        <label>Qty box to sell : </label>
-                        <Select
-                          className="selects"
-                          options={options(data.stocks.box, "Box")}
-                          defaultValue={qtyBox}
-                          onChange={(e) => setQtyBox(e.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="counter-select-field mt-2">
-                      <div className="field-form">
-                        <label>Qty Pcs to sell : </label>
-                        <Select
-                          className="selects"
-                          options={
-                            data.stocks.box > 0
-                              ? options2(data.pcsPerBox, "Pcs")
-                              : options2(data.stocks.pcs, "Pcs")
-                          }
-                          defaultValue={qtyBoxPcs}
-                          onChange={(e) => setQtyBoxPcs(e.value)}
-                        />
-                      </div>
-                    </div>
-                  </>
-                ) : data.unit === unit.roll ? (
-                  <>
-                    <div className="counter-select-field">
-                      <div className="field-form">
-                        <label>Qty Roll to sell : </label>
-                        <Select
-                          className="selects"
-                          options={options(data.stocks.roll, "Roll")}
-                          defaultValue={qtyRoll}
-                          onChange={(e) => setQtyRoll(e.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="counter-select-field mt-2">
-                      <div className="field-form">
-                        <label>Qty Meter to sell : </label>
-                        <Select
-                          className="selects"
-                          options={
-                            data.stocks.roll > 0
-                              ? options2(data.meterPerRoll, "Meter")
-                              : options2(data.stocks.meter, "Meter")
-                          }
-                          defaultValue={qtyMeter}
-                          onChange={(e) => setQtyMeter(e.value)}
-                        />
-                      </div>
-                    </div>
-                  </>
-                ) : data.unit === unit.set ? (
-                  <>
-                    <div className="counter-select-field">
-                      <div className="field-form">
-                        <label>Qty Set to sell : </label>
-                        <Select
-                          className="selects"
-                          options={options(data.stocks.set, "Set")}
-                          defaultValue={qtySet}
-                          onChange={(e) => setQtySet(e.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="counter-select-field mt-2">
-                      <div className="field-form">
-                        <label>Qty Pcs to sell : </label>
-                        <Select
-                          className="selects"
-                          options={
-                            data.stocks.set > 0
-                              ? options2(data.pcsPerSet, "Pcs")
-                              : options2(data.stocks.pcs, "Pcs")
-                          }
-                          defaultValue={qtySetPcs}
-                          onChange={(e) => setQtySetPcs(e.value)}
-                        />
-                      </div>
-                    </div>
-                  </>
-                ) : data.unit === unit.pair ? (
-                  <div className="counter-select-field">
-                    <div className="field-form">
-                      <label>Qty Pair to sell : </label>
-                      <Select
-                        className="selects"
-                        options={options(data.stocks, "Pair")}
-                        defaultValue={qtyPair}
-                        onChange={(e) => setQtyPair(e.value)}
-                      />
-                    </div>
-                  </div>
-                ) : data.unit === unit.bundle ? (
-                  <>
-                    <div className="counter-select-field">
-                      <div className="field-form">
-                        <label>Qty Bundle to sell : </label>
-                        <Select
-                          className="selects"
-                          options={options(data.stocks.bundle, "Bundle")}
-                          defaultValue={qtyBundle}
-                          onChange={(e) => setQtyBundle(e.value)}
-                        />
-                      </div>
-                    </div>
-                    <div className="counter-select-field mt-2">
-                      <div className="field-form">
-                        <label>Qty Pcs to sell : </label>
-                        <Select
-                          className="selects"
-                          options={
-                            data.stocks.bundle > 0
-                              ? options2(data.pcsPerBundle, "Pcs")
-                              : options2(data.stocks.pcs, "Pcs")
-                          }
-                          defaultValue={qtyBundlePcs}
-                          onChange={(e) => setQtyBundlePcs(e.value)}
-                        />
-                      </div>
-                    </div>
-                  </>
+
+                {isOutOfStocks ? (
+                  <h3>Out of stock</h3>
                 ) : (
-                  ""
+                  <>
+                    {data.unit === unit.piece ? (
+                      <div className="counter-select-field">
+                        <div className="field-form">
+                          <label>Qty Pcs to sell : </label>
+                          <Select
+                            className="selects"
+                            options={options(data.stocks, "Pcs")}
+                            defaultValue={qtyPiece}
+                            onChange={(e) => setQtyPiece(e.value)}
+                          />
+                        </div>
+                      </div>
+                    ) : data.unit === unit.pack ? (
+                      <>
+                        <div className="counter-select-field">
+                          <div className="field-form">
+                            <label>Qty pack to sell : </label>
+                            <Select
+                              className="selects"
+                              options={options(data.stocks.pack, "Pack")}
+                              defaultValue={qtyPack}
+                              onChange={(e) => setQtyPack(e.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="counter-select-field mt-2">
+                          <div className="field-form">
+                            <label>Qty Pcs to sell : </label>
+                            <Select
+                              className="selects"
+                              options={
+                                data.stocks.pack > 0
+                                  ? options2(data.pcsPerPack, "Pcs")
+                                  : options2(data.stocks.pcs, "Pcs")
+                              }
+                              defaultValue={qtyPackPcs}
+                              onChange={(e) => setQtyPackPcs(e.value)}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    ) : data.unit === unit.box ? (
+                      <>
+                        <div className="counter-select-field">
+                          <div className="field-form">
+                            <label>Qty box to sell : </label>
+                            <Select
+                              className="selects"
+                              options={options(data.stocks.box, "Box")}
+                              defaultValue={qtyBox}
+                              onChange={(e) => setQtyBox(e.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="counter-select-field mt-2">
+                          <div className="field-form">
+                            <label>Qty Pcs to sell : </label>
+                            <Select
+                              className="selects"
+                              options={
+                                data.stocks.box > 0
+                                  ? options2(data.pcsPerBox, "Pcs")
+                                  : options2(data.stocks.pcs, "Pcs")
+                              }
+                              defaultValue={qtyBoxPcs}
+                              onChange={(e) => setQtyBoxPcs(e.value)}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    ) : data.unit === unit.roll ? (
+                      <>
+                        <div className="counter-select-field">
+                          <div className="field-form">
+                            <label>Qty Roll to sell : </label>
+                            <Select
+                              className="selects"
+                              options={options(data.stocks.roll, "Roll")}
+                              defaultValue={qtyRoll}
+                              onChange={(e) => setQtyRoll(e.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="counter-select-field mt-2">
+                          <div className="field-form">
+                            <label>Qty Meter to sell : </label>
+                            <Select
+                              className="selects"
+                              options={
+                                data.stocks.roll > 0
+                                  ? options2(data.meterPerRoll, "Meter")
+                                  : options2(data.stocks.meter, "Meter")
+                              }
+                              defaultValue={qtyMeter}
+                              onChange={(e) => setQtyMeter(e.value)}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    ) : data.unit === unit.set ? (
+                      <>
+                        <div className="counter-select-field">
+                          <div className="field-form">
+                            <label>Qty Set to sell : </label>
+                            <Select
+                              className="selects"
+                              options={options(data.stocks.set, "Set")}
+                              defaultValue={qtySet}
+                              onChange={(e) => setQtySet(e.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="counter-select-field mt-2">
+                          <div className="field-form">
+                            <label>Qty Pcs to sell : </label>
+                            <Select
+                              className="selects"
+                              options={
+                                data.stocks.set > 0
+                                  ? options2(data.pcsPerSet, "Pcs")
+                                  : options2(data.stocks.pcs, "Pcs")
+                              }
+                              defaultValue={qtySetPcs}
+                              onChange={(e) => setQtySetPcs(e.value)}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    ) : data.unit === unit.pair ? (
+                      <div className="counter-select-field">
+                        <div className="field-form">
+                          <label>Qty Pair to sell : </label>
+                          <Select
+                            className="selects"
+                            options={options(data.stocks, "Pair")}
+                            defaultValue={qtyPair}
+                            onChange={(e) => setQtyPair(e.value)}
+                          />
+                        </div>
+                      </div>
+                    ) : data.unit === unit.bundle ? (
+                      <>
+                        <div className="counter-select-field">
+                          <div className="field-form">
+                            <label>Qty Bundle to sell : </label>
+                            <Select
+                              className="selects"
+                              options={options(data.stocks.bundle, "Bundle")}
+                              defaultValue={qtyBundle}
+                              onChange={(e) => setQtyBundle(e.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="counter-select-field mt-2">
+                          <div className="field-form">
+                            <label>Qty Pcs to sell : </label>
+                            <Select
+                              className="selects"
+                              options={
+                                data.stocks.bundle > 0
+                                  ? options2(data.pcsPerBundle, "Pcs")
+                                  : options2(data.stocks.pcs, "Pcs")
+                              }
+                              defaultValue={qtyBundlePcs}
+                              onChange={(e) => setQtyBundlePcs(e.value)}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      ""
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -1919,6 +2011,33 @@ const Counter = () => {
                   </tr>
                 </tfoot>
               </table>
+            </div>
+          </div>
+        </div>
+        <div className={isDiscountModal ? "modal d-flex" : "modal d-none"}>
+          <div className="modal-body-delete">
+            <button
+              className="modal-close"
+              onClick={() => setIsDiscountModal(false)}
+            >
+              <RiCloseLine />
+            </button>
+            <h3 className="modal-title">Discount password</h3>
+            <div className="input-group w-100">
+              <p id="discheck" className="d-none color-red">
+                Wrong password!
+              </p>
+              <label>Enter password</label>
+              <input
+                type="password"
+                value={disPwd}
+                onChange={(e) => setDisPwd(e.target.value)}
+              />
+            </div>
+            <div className="w-100 text-right">
+              <button className="cbtn" onClick={() => setDiscountPwd()}>
+                Submit
+              </button>
             </div>
           </div>
         </div>

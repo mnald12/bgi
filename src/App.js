@@ -6,8 +6,10 @@ import Signin from "./auth/SIgnin";
 const Datas = createContext(null);
 
 function App() {
-  const [isLogin, setIsLogin] = useState(false);
-  const [role, setRole] = useState(null);
+  const [isLogin, setIsLogin] = useState(
+    window.sessionStorage.getItem("isLogin")
+  );
+  const [role, setRole] = useState(window.sessionStorage.getItem("role"));
 
   return (
     <div className="App">

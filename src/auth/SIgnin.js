@@ -27,6 +27,8 @@ const Signin = () => {
       if (uname === data.username && pwd === data.password) {
         setRole("admin");
         setIsLogin(true);
+        window.sessionStorage.setItem("isLogin", true);
+        window.sessionStorage.setItem("role", "admin");
       } else {
         setAdminErr(true);
         setAdminUname("");
@@ -43,6 +45,8 @@ const Signin = () => {
       if (uname === data.username && pwd === data.password) {
         setRole("keeper");
         setIsLogin(true);
+        window.sessionStorage.setItem("isLogin", true);
+        window.sessionStorage.setItem("role", "keeper");
       } else {
         setKeeperErr(true);
         setKeeperUname("");

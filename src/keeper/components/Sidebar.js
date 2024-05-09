@@ -5,7 +5,6 @@ import { IoPerson } from "react-icons/io5";
 import { BsCalculatorFill, BsFillBoxFill } from "react-icons/bs";
 import { HiInboxArrowDown } from "react-icons/hi2";
 import { FaPesoSign } from "react-icons/fa6";
-import { TbHelpHexagonFilled } from "react-icons/tb";
 import { useContext } from "react";
 import { SideData } from "../Keeper";
 
@@ -25,13 +24,20 @@ const Sidebar = () => {
         </div>
         <button
           className={sideActive === "dashboard" ? "active" : ""}
-          onClick={() => setSideActive("dashboard")}
+          onClick={() => {
+            setSideActive("dashboard");
+            window.sessionStorage.setItem("sideActive", "dashboard");
+          }}
         >
           <BiSolidDashboard className="icn" /> Dashboard
         </button>
         <button
           className={sideActive === "counter" ? "active" : ""}
-          onClick={() => setSideActive("counter")}
+          onClick={() => {
+            setSideActive("counter");
+
+            window.sessionStorage.setItem("sideActive", "counter");
+          }}
         >
           <BsCalculatorFill className="icn" /> Counter
         </button>
@@ -41,7 +47,10 @@ const Sidebar = () => {
         </div>
         <button
           className={sideActive === "products" ? "active" : ""}
-          onClick={() => setSideActive("products")}
+          onClick={() => {
+            setSideActive("products");
+            window.sessionStorage.setItem("sideActive", "products");
+          }}
         >
           <BsFillBoxFill className="icn" /> Products
         </button>
@@ -54,7 +63,10 @@ const Sidebar = () => {
         </button>
         <button
           className={sideActive === "return" ? "active" : ""}
-          onClick={() => setSideActive("return")}
+          onClick={() => {
+            setSideActive("return");
+            window.sessionStorage.setItem("sideActive", "return");
+          }}
         >
           <HiInboxArrowDown className="icn" />
           Return
@@ -65,7 +77,10 @@ const Sidebar = () => {
         </div>
         <button
           className={sideActive === "profile" ? "active" : ""}
-          onClick={() => setSideActive("profile")}
+          onClick={() => {
+            setSideActive("profile");
+            window.sessionStorage.setItem("sideActive", "profile");
+          }}
         >
           <IoPerson className="icn" />
           My Profile

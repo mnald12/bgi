@@ -32,7 +32,7 @@ const Sales = () => {
 
   useEffect(() => {
     const get = async () => {
-      const q = query(collection(db, "sales"), orderBy("date"));
+      const q = query(collection(db, "sales"), orderBy("date", "desc"));
       const querySnapshot = await getDocs(q);
       const sales = querySnapshot.docs.map((doc) => {
         return { id: doc.id, ...doc.data() };
@@ -79,7 +79,6 @@ const Sales = () => {
                 <th>Customer Name</th>
                 <th>Date</th>
                 <th>Sales</th>
-                <th>Income</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -91,13 +90,6 @@ const Sales = () => {
                   <td>
                     ₱{" "}
                     {sale.sales.toLocaleString("en", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </td>
-                  <td>
-                    ₱{" "}
-                    {sale.income.toLocaleString("en", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}

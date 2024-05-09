@@ -194,31 +194,77 @@ const Products = () => {
                 )}
                 {prod.unit === unit.pack ? (
                   <td>
-                    <span>{prod.stocks.pack} Packs and </span>
-                    <span>{prod.stocks.pcs} Pcs</span>
+                    {prod.stocks.pack === 0 && prod.stocks.pcs === 0 ? (
+                      <span style={{ color: "red" }}>Out of stock</span>
+                    ) : (
+                      <>
+                        <span>{prod.stocks.pack} Packs and </span>
+                        <span>{prod.stocks.pcs} Pcs</span>
+                      </>
+                    )}
+                  </td>
+                ) : prod.unit === unit.piece ? (
+                  <td>
+                    {prod.stocks === 0 ? (
+                      <span style={{ color: "red" }}>Out of stock</span>
+                    ) : (
+                      <span>{prod.stocks} Pcs </span>
+                    )}
                   </td>
                 ) : prod.unit === unit.box ? (
                   <td>
-                    <span>{prod.stocks.box} Box's and </span>
-                    <span>{prod.stocks.pcs} Pcs</span>
+                    {prod.stocks.box === 0 && prod.stocks.pcs === 0 ? (
+                      <span style={{ color: "red" }}>Out of stock</span>
+                    ) : (
+                      <>
+                        <span>{prod.stocks.box} Box's and </span>
+                        <span>{prod.stocks.pcs} Pcs</span>
+                      </>
+                    )}
                   </td>
                 ) : prod.unit === unit.roll ? (
                   <td>
-                    <span>{prod.stocks.roll} Rolls and </span>
-                    <span>{prod.stocks.meter} Meters</span>
+                    {prod.stocks.roll === 0 && prod.stocks.meter === 0 ? (
+                      <span style={{ color: "red" }}>Out of stock</span>
+                    ) : (
+                      <>
+                        <span>{prod.stocks.roll} Rolls and </span>
+                        <span>{prod.stocks.meter} Meters</span>
+                      </>
+                    )}
                   </td>
                 ) : prod.unit === unit.set ? (
                   <td>
-                    <span>{prod.stocks.set} Sets and </span>
-                    <span>{prod.stocks.pcs} Pcs</span>
+                    {prod.stocks.set === 0 && prod.stocks.pcs === 0 ? (
+                      <span style={{ color: "red" }}>Out of stock</span>
+                    ) : (
+                      <>
+                        <span>{prod.stocks.set} Sets and </span>
+                        <span>{prod.stocks.pcs} Pcs</span>
+                      </>
+                    )}
+                  </td>
+                ) : prod.unit === unit.pair ? (
+                  <td>
+                    {prod.stocks === 0 ? (
+                      <span style={{ color: "red" }}>Out of stock</span>
+                    ) : (
+                      <span>{prod.stocks} Pair </span>
+                    )}
                   </td>
                 ) : prod.unit === unit.bundle ? (
                   <td>
-                    <span>{prod.stocks.bundle} Bundles and </span>
-                    <span>{prod.stocks.pcs} Pcs</span>
+                    {prod.stocks.bundle === 0 && prod.stocks.pcs === 0 ? (
+                      <span style={{ color: "red" }}>Out of stock</span>
+                    ) : (
+                      <>
+                        <span>{prod.stocks.bundle} Bundles and </span>
+                        <span>{prod.stocks.pcs} Pcs</span>
+                      </>
+                    )}
                   </td>
                 ) : (
-                  <td>{prod.stocks} Pcs</td>
+                  <td></td>
                 )}
               </tr>
             ))}

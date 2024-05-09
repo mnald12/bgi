@@ -32,7 +32,7 @@ const Header = () => {
         <button className="menu" onClick={() => hideBar()}>
           <TbMenu2 />
         </button>
-        <div className="user-option">
+        <div className="user-options">
           <div className="user-texts">
             <h4>{user.fullName}</h4>
             <p>Keeper</p>
@@ -68,6 +68,8 @@ const Header = () => {
             onClick={() => {
               setIsLogin(false);
               setRole(null);
+              window.sessionStorage.setItem("isLogin", false);
+              window.sessionStorage.setItem("role", null);
             }}
           >
             Logout

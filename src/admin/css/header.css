@@ -33,10 +33,28 @@
   justify-content: center;
   gap: 10px;
   position: absolute;
-  right: 86px !important;
+  right: 126px !important;
   border-right: 1px solid black !important;
 }
 
+.header .user-options {
+  background: transparent;
+  padding: 0 !important;
+  padding-right: 10px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: absolute;
+  right: 85px !important;
+  border-right: 1px solid black !important;
+}
+
+.header .user-options img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
 .user-texts {
   text-align: right;
   padding: 0;
@@ -103,10 +121,38 @@
   transform: translateY(3px);
 }
 
+.notif {
+  position: absolute;
+  right: 85px;
+  font-size: 28px;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  transform: translateY(4px);
+}
+
+.notif h6 {
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  font-size: 10px;
+  border-radius: 50%;
+  background-color: red;
+  color: aliceblue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: 0;
+  top: -6px;
+  z-index: 100;
+}
+
 .lg-icn {
   transition: 0.5s !important;
 }
-.helps:hover .lg-icn {
+
+.helps:hover .lg-icn,
+.notif:hover .lg-icn {
   transform: scale(1.1);
 }
 
@@ -125,4 +171,83 @@
 }
 .logouts:hover .lg-icn {
   transform: scale(1.1);
+}
+
+.notifs {
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(8px);
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 9999;
+  overflow-x: hidden;
+}
+
+.notifs .notifs-body {
+  width: 320px;
+  height: 100vh;
+  background-color: aliceblue;
+  animation: toshow 0.8s ease-in-out;
+  position: relative;
+}
+
+.notifs .notifs-header {
+  width: 100%;
+  height: auto;
+  background-color: #d5d5d5;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+}
+
+.notifs .notifs-header h3 {
+  margin: 0;
+}
+
+.notifs .notifs-header .notifs-close {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  right: 12px;
+  color: red;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 32px;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes toshow {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.notifs-item {
+  width: 100%;
+  height: auto;
+  background-color: aliceblue;
+  padding: 12px;
+  display: block;
+  border: none;
+  outline: none;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.338);
+  transition: 0.5s;
+}
+
+.notifs-item:hover {
+  background-color: #d4d6d668;
 }

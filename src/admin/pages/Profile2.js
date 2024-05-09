@@ -12,6 +12,7 @@ const Profile = () => {
   const [profile, setProfile] = useState({});
   const [isUpModal, setIsUpModal] = useState(false);
   const [isUpPassModal, setIsUpPassModal] = useState(false);
+  const [isUpDisPassModal, setIsUpDisPassModal] = useState(false);
   const [uname, setUname] = useState("");
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
@@ -20,6 +21,8 @@ const Profile = () => {
   const [img, setImg] = useState("");
   const [pwd, setPwd] = useState("");
   const [rpwd, setRpwd] = useState("");
+  const [disPwd, setDisPwd] = useState("");
+  const [rDisPwd, setRDisPwd] = useState("");
 
   useEffect(() => {
     const getProd = async () => {
@@ -100,12 +103,32 @@ const Profile = () => {
     }
   };
 
+  const updateDisPwd = async () => {
+    if (disPwd !== rDisPwd) {
+      document.getElementById("rdispwdtxt").classList.remove("d-none");
+      setTimeout(() => {
+        document.getElementById("rdispwdtxt").classList.add("d-none");
+      }, 2000);
+      return;
+    }
+    if (disPwd !== "") {
+      setIsloaded(false);
+      await updateDoc(doc(db, "users", "discount_pwd"), {
+        password: disPwd,
+      });
+      setDisPwd("");
+      setRDisPwd("");
+      setIsUpDisPassModal(false);
+      setIsloaded(true);
+    }
+  };
+
   if (isLoaded) {
     return (
       <>
         <div className="profile">
           <div className="page-header">
-            <h3 className="page-title">My Profile</h3>
+            <h3 className="page-title">Keeper's Profile</h3>
             <div className="search-bars">
               <button
                 className="add-bar"
@@ -114,6 +137,14 @@ const Profile = () => {
                 }}
               >
                 Change password
+              </button>
+              <button
+                className="add-bar bg-yellow color-black"
+                onClick={() => {
+                  setIsUpDisPassModal(true);
+                }}
+              >
+                Change discount password
               </button>
               <button
                 className="add-bar bg-orange"
@@ -274,6 +305,41 @@ const Profile = () => {
             <div className="w-100 text-right mt-12px">
               <button className="cbtn bg-orange" onClick={() => updatePwd()}>
                 Update Password
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className={isUpDisPassModal ? "modal d-flex" : "modal d-none"}>
+          <div className="modal-body-delete">
+            <button
+              className="modal-close"
+              onClick={() => setIsUpDisPassModal(false)}
+            >
+              <RiCloseLine />
+            </button>
+            <h3 className="modal-title">Change Discount Password</h3>
+            <div id="rdispwdtxt" className="d-none">
+              <p className="color-red">Repeat Password is incorrect!</p>
+            </div>
+            <div className="input-group w-100">
+              <label>New Password :</label>
+              <input
+                type="password"
+                value={disPwd}
+                onChange={(e) => setDisPwd(e.target.value)}
+              />
+            </div>
+            <div className="input-group w-100 mt-12px">
+              <label>Repeat Password :</label>
+              <input
+                type="password"
+                value={rDisPwd}
+                onChange={(e) => setRDisPwd(e.target.value)}
+              />
+            </div>
+            <div className="w-100 text-right mt-12px">
+              <button className="cbtn bg-orange" onClick={() => updateDisPwd()}>
+                Update Discount Password
               </button>
             </div>
           </div>

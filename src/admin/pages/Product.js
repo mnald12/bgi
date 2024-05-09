@@ -899,7 +899,13 @@ const Product = () => {
                     <td>
                       <b>Stocks Left</b>
                     </td>
-                    <td>{product.stocks} Pcs</td>
+                    <td>
+                      {product.stocks > 0 ? (
+                        `${product.stocks} Pcs`
+                      ) : (
+                        <p style={{ color: "red" }}>Out of stock</p>
+                      )}
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -984,7 +990,11 @@ const Product = () => {
                       <b>Stocks Left</b>
                     </td>
                     <td>
-                      {product.stocks.pack} Packs and {product.stocks.pcs} Pcs
+                      {product.stocks.pack > 0 || product.stocks.pcs > 0 ? (
+                        `${product.stocks.pack} Packs and ${product.stocks.pcs} Pcs`
+                      ) : (
+                        <p style={{ color: "red" }}>Out of stock</p>
+                      )}
                     </td>
                   </tr>
                   <tr>
@@ -1084,7 +1094,11 @@ const Product = () => {
                       <b>Stocks Left</b>
                     </td>
                     <td>
-                      {product.stocks.box} Box and {product.stocks.pcs} Pcs
+                      {product.stocks.box > 0 || product.stocks.pcs > 0 ? (
+                        `${product.stocks.box} Box and ${product.stocks.pcs} Pcs`
+                      ) : (
+                        <p style={{ color: "red" }}>Out of stock</p>
+                      )}
                     </td>
                   </tr>
                   <tr>
@@ -1184,8 +1198,11 @@ const Product = () => {
                       <b>Stocks Left</b>
                     </td>
                     <td>
-                      {product.stocks.roll} Roll and {product.stocks.meter}{" "}
-                      Meter
+                      {product.stocks.roll > 0 || product.stocks.meter > 0 ? (
+                        `${product.stocks.roll} Roll and ${product.stocks.meter} Meter`
+                      ) : (
+                        <p style={{ color: "red" }}>Out of stock</p>
+                      )}
                     </td>
                   </tr>
                   <tr>
@@ -1285,7 +1302,11 @@ const Product = () => {
                       <b>Stocks Left</b>
                     </td>
                     <td>
-                      {product.stocks.set} Set and {product.stocks.pcs} Pcs
+                      {product.stocks.set > 0 || product.stocks.pcs > 0 ? (
+                        `${product.stocks.set} Set and ${product.stocks.pcs} Pcs`
+                      ) : (
+                        <p style={{ color: "red" }}>Out of stock</p>
+                      )}
                     </td>
                   </tr>
                   <tr>
@@ -1381,7 +1402,13 @@ const Product = () => {
                     <td>
                       <b>Stocks Left</b>
                     </td>
-                    <td>{product.stocks} Pair</td>
+                    <td>
+                      {product.stocks > 0 ? (
+                        `${product.stocks} Pair`
+                      ) : (
+                        <p style={{ color: "red" }}>Out of stock</p>
+                      )}
+                    </td>
                   </tr>
                   <tr>
                     <td>
@@ -1466,8 +1493,11 @@ const Product = () => {
                       <b>Stocks Left</b>
                     </td>
                     <td>
-                      {product.stocks.bundle} Bundle and {product.stocks.pcs}{" "}
-                      Pcs
+                      {product.stocks.bundle > 0 || product.stocks.pcs > 0 ? (
+                        `${product.stocks.bundle} Bundle and ${product.stocks.bundle} Pcs`
+                      ) : (
+                        <p style={{ color: "red" }}>Out of stock</p>
+                      )}
                     </td>
                   </tr>
                   <tr>

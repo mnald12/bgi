@@ -2,8 +2,10 @@
   --blue: blue;
   --white: white;
   --orange: orange;
+  --yellow: yellow;
   --red: red;
   --green: green;
+  --black: black;
 }
 
 * {
@@ -37,6 +39,10 @@
   background-color: var(--orange) !important;
 }
 
+.bg-yellow {
+  background-color: var(--yellow) !important;
+}
+
 .color-green {
   color: var(--green) !important;
 }
@@ -47,6 +53,10 @@
 
 .color-white {
   color: var(--white);
+}
+
+.color-black {
+  color: var(--black) !important;
 }
 
 .flex-container {
@@ -176,6 +186,7 @@ button {
 
 table {
   width: 100%;
+  background-color: white !important;
   margin-bottom: 10px;
   font-size: 15px;
 }

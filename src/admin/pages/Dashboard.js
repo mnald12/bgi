@@ -20,8 +20,12 @@ const fn = (n) => {
 
 const checkDiff = (n1, n2) => {
   const p = Math.round(100 * Math.abs((n1 - n2) / ((n1 + n2) / 2)).toFixed(2));
-  if (p > 100) return p - 100;
-  else return p;
+  if (isNaN(p)) {
+    return 0;
+  } else {
+    if (p > 100) return p - 100;
+    else return p;
+  }
 };
 
 const mapLabel = (arr) => {
@@ -461,8 +465,9 @@ const Dashboard = () => {
           style={{
             position: "relative",
             marginTop: "20px",
-            width: "100%",
+            width: "calc(100% - 16px)",
             height: "100%",
+            backgroundColor: "white",
           }}
         >
           <Line height={300} data={lineDatas} options={lineOptions} />
@@ -471,8 +476,9 @@ const Dashboard = () => {
           style={{
             position: "relative",
             marginTop: "20px",
-            width: "100%",
+            width: "calc(100% - 16px)",
             height: "100%",
+            backgroundColor: "white",
           }}
         >
           <Bar

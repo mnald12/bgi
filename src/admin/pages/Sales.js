@@ -32,7 +32,7 @@ const Sales = () => {
 
   useEffect(() => {
     const get = async () => {
-      const q = query(collection(db, "sales"), orderBy("date"));
+      const q = query(collection(db, "sales"), orderBy("date", "desc"));
       const querySnapshot = await getDocs(q);
       const sales = querySnapshot.docs.map((doc) => {
         return { id: doc.id, ...doc.data() };

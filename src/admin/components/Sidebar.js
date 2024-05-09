@@ -27,7 +27,10 @@ const Sidebar = () => {
         </div>
         <button
           className={sideActive === "dashboard" ? "active" : ""}
-          onClick={() => setSideActive("dashboard")}
+          onClick={() => {
+            setSideActive("dashboard");
+            window.sessionStorage.setItem("sideActive", "dashboard");
+          }}
         >
           <BiSolidDashboard className="icn" /> Dashboard
         </button>
@@ -37,33 +40,48 @@ const Sidebar = () => {
         </div>
         <button
           className={sideActive === "categories" ? "active" : ""}
-          onClick={() => setSideActive("categories")}
+          onClick={() => {
+            setSideActive("categories");
+            window.sessionStorage.setItem("sideActive", "categories");
+          }}
         >
           <BiSolidCategoryAlt className="icn" /> Categories
         </button>
         <button
           className={sideActive === "products" ? "active" : ""}
-          onClick={() => setSideActive("products")}
+          onClick={() => {
+            setSideActive("products");
+            window.sessionStorage.setItem("sideActive", "products");
+          }}
         >
           <BsFillBoxFill className="icn" /> Products
         </button>
         <button
           className={sideActive === "sales" ? "active" : ""}
-          onClick={() => setSideActive("sales")}
+          onClick={() => {
+            setSideActive("sales");
+            window.sessionStorage.setItem("sideActive", "sales");
+          }}
         >
           <FaPesoSign className="icn" />
           Sales
         </button>
         <button
           className={sideActive === "returns" ? "active" : ""}
-          onClick={() => setSideActive("returns")}
+          onClick={() => {
+            setSideActive("returns");
+            window.sessionStorage.setItem("sideActive", "returns");
+          }}
         >
           <HiInboxArrowDown className="icn" />
           Return
         </button>
         <button
           className={sideActive === "archived" ? "active" : ""}
-          onClick={() => setSideActive("archived")}
+          onClick={() => {
+            setSideActive("archived");
+            window.sessionStorage.setItem("sideActive", "archived");
+          }}
         >
           <IoArchive className="icn" />
           Archives
@@ -74,14 +92,20 @@ const Sidebar = () => {
         </div>
         <button
           className={sideActive === "myprofile" ? "active" : ""}
-          onClick={() => setSideActive("myprofile")}
+          onClick={() => {
+            setSideActive("myprofile");
+            window.sessionStorage.setItem("sideActive", "myprofile");
+          }}
         >
           <IoPerson className="icn" />
           My Profile
         </button>
         <button
           className={sideActive === "keeperprofile" ? "active" : ""}
-          onClick={() => setSideActive("keeperprofile")}
+          onClick={() => {
+            setSideActive("keeperprofile");
+            window.sessionStorage.setItem("sideActive", "keeperprofile");
+          }}
         >
           <IoPerson className="icn" />
           Keeper

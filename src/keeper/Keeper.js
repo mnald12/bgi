@@ -16,7 +16,11 @@ Chart.register(...registerables);
 const SideData = createContext(null);
 
 const Keeper = () => {
-  const [sideActive, setSideActive] = useState("dashboard");
+  const [sideActive, setSideActive] = useState(
+    window.sessionStorage.getItem("sideActive")
+      ? window.sessionStorage.getItem("sideActive")
+      : "dashboard"
+  );
   const [drafts, setDrafts] = useState([]);
   const [saleId, setSaleId] = useState(null);
   const [user, setUser] = useState({});
