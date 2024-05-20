@@ -20,7 +20,7 @@ import { cryptoRandomStringAsync } from "crypto-random-string";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 const Product = () => {
-  const { productId } = useContext(SideData);
+  const { productId, reloadNotifs } = useContext(SideData);
   const [product, setProduct] = useState({ productName: "" });
   const [isLoaded, setIsloaded] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
@@ -787,6 +787,7 @@ const Product = () => {
     setProduct(docSnap.data());
 
     setIsRestock(false);
+    reloadNotifs();
   };
 
   if (isLoaded) {

@@ -1,9 +1,11 @@
 import {
   addDoc,
   collection,
+  doc,
   getDocs,
   orderBy,
   query,
+  updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../db/config";
@@ -133,6 +135,11 @@ const Return = () => {
       return;
     }
     if (activeProd.unit === unit.piece) {
+      if (action === "Replace") {
+        await updateDoc(doc(db, "products", activeProd.id), {
+          stocks: activeProd.stocks - +qtyPcs,
+        });
+      }
       const retRefs = collection(db, "returns");
       const newRet = await addDoc(retRefs, {
         unit: activeProd.unit,
@@ -157,6 +164,24 @@ const Return = () => {
         },
       ]);
     } else if (activeProd.unit === unit.pack) {
+      if (action === "Replace") {
+        const newStocks = {
+          pack: activeProd.stocks.pack,
+          pcs: activeProd.stocks.pcs,
+        };
+        if (newStocks.pcs >= +qtyPackPcs) {
+          newStocks.pack = newStocks.pack - +qtyPack;
+          newStocks.pcs = newStocks.pcs - +qtyPackPcs;
+        } else {
+          newStocks.pack = newStocks.pack - 1;
+          newStocks.pcs = newStocks.pcs + activeProd.pcsPerPack;
+          newStocks.pack = newStocks.pack - +qtyPack;
+          newStocks.pcs = newStocks.pcs - +qtyPackPcs;
+        }
+        await updateDoc(doc(db, "products", activeProd.id), {
+          stocks: newStocks,
+        });
+      }
       const retRefs = collection(db, "returns");
       const newRet = await addDoc(retRefs, {
         unit: activeProd.unit,
@@ -187,6 +212,24 @@ const Return = () => {
         },
       ]);
     } else if (activeProd.unit === unit.box) {
+      if (action === "Replace") {
+        const newStocks = {
+          box: activeProd.stocks.box,
+          pcs: activeProd.stocks.pcs,
+        };
+        if (newStocks.pcs >= +qtyBoxPcs) {
+          newStocks.box = newStocks.box - +qtyBox;
+          newStocks.pcs = newStocks.pcs - +qtyBoxPcs;
+        } else {
+          newStocks.box = newStocks.box - 1;
+          newStocks.pcs = newStocks.pcs + activeProd.pcsPerBox;
+          newStocks.box = newStocks.box - +qtyBox;
+          newStocks.pcs = newStocks.pcs - +qtyBoxPcs;
+        }
+        await updateDoc(doc(db, "products", activeProd.id), {
+          stocks: newStocks,
+        });
+      }
       const retRefs = collection(db, "returns");
       const newRet = await addDoc(retRefs, {
         unit: activeProd.unit,
@@ -217,6 +260,24 @@ const Return = () => {
         },
       ]);
     } else if (activeProd.unit === unit.roll) {
+      if (action === "Replace") {
+        const newStocks = {
+          roll: activeProd.stocks.roll,
+          meter: activeProd.stocks.meter,
+        };
+        if (newStocks.meter >= +qtyMeter) {
+          newStocks.roll = newStocks.roll - +qtyRoll;
+          newStocks.meter = newStocks.meter - +qtyMeter;
+        } else {
+          newStocks.roll = newStocks.roll - 1;
+          newStocks.meter = newStocks.meter + activeProd.meterPerRoll;
+          newStocks.roll = newStocks.roll - +qtyRoll;
+          newStocks.meter = newStocks.meter - +qtyMeter;
+        }
+        await updateDoc(doc(db, "products", activeProd.id), {
+          stocks: newStocks,
+        });
+      }
       const retRefs = collection(db, "returns");
       const newRet = await addDoc(retRefs, {
         unit: activeProd.unit,
@@ -247,6 +308,24 @@ const Return = () => {
         },
       ]);
     } else if (activeProd.unit === unit.set) {
+      if (action === "Replace") {
+        const newStocks = {
+          set: activeProd.stocks.set,
+          pcs: activeProd.stocks.pcs,
+        };
+        if (newStocks.pcs >= +qtySetPcs) {
+          newStocks.set = newStocks.set - +qtySet;
+          newStocks.pcs = newStocks.pcs - +qtySetPcs;
+        } else {
+          newStocks.set = newStocks.set - 1;
+          newStocks.pcs = newStocks.pcs + activeProd.pcsPerSet;
+          newStocks.set = newStocks.set - +qtySet;
+          newStocks.pcs = newStocks.pcs - +qtySetPcs;
+        }
+        await updateDoc(doc(db, "products", activeProd.id), {
+          stocks: newStocks,
+        });
+      }
       const retRefs = collection(db, "returns");
       const newRet = await addDoc(retRefs, {
         unit: activeProd.unit,
@@ -277,6 +356,11 @@ const Return = () => {
         },
       ]);
     } else if (activeProd.unit === unit.pair) {
+      if (action === "Replace") {
+        await updateDoc(doc(db, "products", activeProd.id), {
+          stocks: activeProd.stocks - +qtyPair,
+        });
+      }
       const retRefs = collection(db, "returns");
       const newRet = await addDoc(retRefs, {
         unit: activeProd.unit,
@@ -301,6 +385,24 @@ const Return = () => {
         },
       ]);
     } else if (activeProd.unit === unit.bundle) {
+      if (action === "Replace") {
+        const newStocks = {
+          bundle: activeProd.stocks.bundle,
+          pcs: activeProd.stocks.pcs,
+        };
+        if (newStocks.pcs >= +qtyBundlePcs) {
+          newStocks.bundle = newStocks.bundle - +qtyBundle;
+          newStocks.pcs = newStocks.pcs - +qtyBundlePcs;
+        } else {
+          newStocks.bundle = newStocks.bundle - 1;
+          newStocks.pcs = newStocks.pcs + activeProd.pcsPerBundle;
+          newStocks.bundle = newStocks.bundle - +qtyBundle;
+          newStocks.pcs = newStocks.pcs - +qtyBundlePcs;
+        }
+        await updateDoc(doc(db, "products", activeProd.id), {
+          stocks: newStocks,
+        });
+      }
       const retRefs = collection(db, "returns");
       const newRet = await addDoc(retRefs, {
         unit: activeProd.unit,

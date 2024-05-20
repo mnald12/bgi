@@ -8,16 +8,15 @@ import { RiCloseLine } from "react-icons/ri";
 import { IoWarningOutline } from "react-icons/io5";
 import { TbHelpHexagonFilled } from "react-icons/tb";
 import { FaBell } from "react-icons/fa";
-import { collection, getDocs, query } from "firebase/firestore";
-import { db } from "../../db/config";
+import moment from "moment";
 
 const Header = () => {
   const { setIsLogin, setRole } = useContext(Datas);
-  const { user, setSideActive, setProductId } = useContext(SideData);
+  const { user, setSideActive, setProductId, notifs } = useContext(SideData);
   const [isLogout, setIsLogout] = useState(false);
   const [isHelp, setIsHelp] = useState(false);
   const [isNotif, setIsNotif] = useState(false);
-  const [notifs, setNotifs] = useState([]);
+  const [dateTime, setDateTime] = useState(moment().format("LLL"));
   let menuToggle = false;
 
   const hideBar = () => {
@@ -31,130 +30,10 @@ const Header = () => {
   };
 
   useEffect(() => {
-    const unit = {
-      piece: "Piece",
-      pack: "Pack",
-      box: "Box",
-      roll: "Roll",
-      set: "Set",
-      pair: "Pair",
-      bundle: "Bundle",
-    };
-
-    const get = async () => {
-      const q = query(collection(db, "products"));
-      const querySnapshot = await getDocs(q);
-      const prods = querySnapshot.docs.map((doc) => {
-        return { id: doc.id, ...doc.data() };
-      });
-      const title1 = "Product is out of stock";
-      const title2 = "Product almost out of stocks";
-      const ntfs = [];
-      for (let i of prods) {
-        if (i.unit === unit.piece) {
-          if (i.stocks === 0) {
-            ntfs.push({
-              id: i.id,
-              title: title1,
-              productName: i.productName,
-            });
-          } else if (i.stocks < 6) {
-            ntfs.push({
-              id: i.id,
-              title: title2,
-              productName: i.productName,
-            });
-          }
-        } else if (i.unit === unit.pair) {
-          if (i.stocks === 0) {
-            ntfs.push({
-              id: i.id,
-              title: title1,
-              productName: i.productName,
-            });
-          } else if (i.stocks < 6) {
-            ntfs.push({
-              id: i.id,
-              title: title2,
-              productName: i.productName,
-            });
-          }
-        } else if (i.unit === unit.pack) {
-          if (i.stocks.pack === 0 && i.stocks.pcs === 0) {
-            ntfs.push({
-              id: i.id,
-              title: title1,
-              productName: i.productName,
-            });
-          } else if (i.stocks.pack === 0 && i.stocks.pcs < 10) {
-            ntfs.push({
-              id: i.id,
-              title: title2,
-              productName: i.productName,
-            });
-          }
-        } else if (i.unit === unit.box) {
-          if (i.stocks.box === 0 && i.stocks.pcs === 0) {
-            ntfs.push({
-              id: i.id,
-              title: title1,
-              productName: i.productName,
-            });
-          } else if (i.stocks.box === 0 && i.stocks.pcs < 10) {
-            ntfs.push({
-              id: i.id,
-              title: title2,
-              productName: i.productName,
-            });
-          }
-        } else if (i.unit === unit.roll) {
-          if (i.stocks.roll === 0 && i.stocks.meter === 0) {
-            ntfs.push({
-              id: i.id,
-              title: title1,
-              productName: i.productName,
-            });
-          } else if (i.stocks.roll === 0 && i.stocks.meter < 10) {
-            ntfs.push({
-              id: i.id,
-              title: title2,
-              productName: i.productName,
-            });
-          }
-        } else if (i.unit === unit.set) {
-          if (i.stocks.set === 0 && i.stocks.pcs === 0) {
-            ntfs.push({
-              id: i.id,
-              title: title1,
-              productName: i.productName,
-            });
-          } else if (i.stocks.set === 0 && i.stocks.pcs < 10) {
-            ntfs.push({
-              id: i.id,
-              title: title2,
-              productName: i.productName,
-            });
-          }
-        } else if (i.unit === unit.bundle) {
-          if (i.stocks.bundle === 0 && i.stocks.pcs === 0) {
-            ntfs.push({
-              id: i.id,
-              title: title1,
-              productName: i.productName,
-            });
-          } else if (i.stocks.bundle === 0 && i.stocks.pcs < 10) {
-            ntfs.push({
-              id: i.id,
-              title: title2,
-              productName: i.productName,
-            });
-          }
-        }
-      }
-      setNotifs(ntfs);
-    };
-    get();
-  }, []);
+    setInterval(() => {
+      setDateTime(moment().format("LLL"));
+    }, 1000);
+  });
 
   return (
     <>
@@ -162,6 +41,7 @@ const Header = () => {
         <button className="menu" onClick={() => hideBar()}>
           <TbMenu2 />
         </button>
+        <h4 style={{ paddingLeft: "6px" }}>{dateTime}</h4>
         <div className="user-option">
           <div className="user-texts">
             <h4>{user.fullName}</h4>

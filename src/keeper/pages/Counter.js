@@ -75,11 +75,18 @@ const Counter = () => {
 
   const options2 = (count, unit) => {
     const opts = [];
-    for (let i = 0; i < count; i++) {
+    if (count === 1) {
       opts.push({
-        value: i,
-        label: `${i} ${unit}`,
+        value: 1,
+        label: `1 ${unit}`,
       });
+    } else {
+      for (let i = 0; i < count; i++) {
+        opts.push({
+          value: i,
+          label: `${i} ${unit}`,
+        });
+      }
     }
     return opts;
   };
@@ -1191,7 +1198,7 @@ const Counter = () => {
                 </table>
 
                 {isOutOfStocks ? (
-                  <h3>Out of stock</h3>
+                  <h3 className="color-red">Out of stock</h3>
                 ) : (
                   <>
                     {data.unit === unit.piece ? (

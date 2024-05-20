@@ -1,4 +1,4 @@
-import { collection, getDocs, query } from "firebase/firestore";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../../db/config";
 import Loader from "../components/Loader";
@@ -20,7 +20,7 @@ const Return = () => {
 
   useEffect(() => {
     const get = async () => {
-      const q = query(collection(db, "returns"));
+      const q = query(collection(db, "returns"), orderBy("date", "desc"));
       const querySnapshot = await getDocs(q);
       const res = querySnapshot.docs.map((doc) => {
         return { id: doc.id, ...doc.data() };
