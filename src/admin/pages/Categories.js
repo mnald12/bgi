@@ -5,7 +5,6 @@ import Loader from "../components/Loader";
 import {
   addDoc,
   collection,
-  deleteDoc,
   doc,
   getDocs,
   orderBy,
@@ -50,7 +49,11 @@ const Categories = () => {
       return;
     }
     const categoryRef = collection(db, "categories");
-    const newCat = await addDoc(categoryRef, { name: catName, sales: 0 });
+    const newCat = await addDoc(categoryRef, {
+      isDeleted: false,
+      name: catName,
+      sales: 0,
+    });
     setCategories((prev) => [
       ...prev,
       {
@@ -88,7 +91,9 @@ const Categories = () => {
   const deleteCat = async () => {
     setIsDeleteModal(false);
     setCategories((l) => l.filter((item) => item.id !== idToDelete));
-    await deleteDoc(doc(db, "categories", idToDelete));
+    await updateDoc(doc(db, "categories", idToDelete), {
+      isDeleted: true,
+    });
   };
 
   if (isLoaded) {
@@ -122,7 +127,7 @@ const Categories = () => {
           </thead>
           <tbody id="tbody">
             {categories.map((cat, id) => (
-              <tr key={id}>
+              <tr key={id} className={cat.isDeleted ? "d-none" : ""}>
                 <td>{cat.name}</td>
                 <td>
                   ₱{" "}

@@ -11,6 +11,7 @@ import { FaBell } from "react-icons/fa";
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../../db/config";
 import moment from "moment";
+import help from "../videos/keeperhelp.mp4";
 
 const Header = () => {
   const { setIsLogin, setRole } = useContext(Datas);
@@ -174,7 +175,7 @@ const Header = () => {
         <div className="user-option">
           <div className="user-texts">
             <h4>{user.fullName}</h4>
-            <p>Admin</p>
+            <p>Keeper</p>
           </div>
           <img alt="user" src={user.avatar} />
         </div>
@@ -233,6 +234,24 @@ const Header = () => {
             <RiCloseLine />
           </button>
           <h3 className="modal-title">Help</h3>
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              transform: "translateY(-30px)",
+            }}
+          >
+            <video
+              style={{ width: "100%", height: "100%" }}
+              id="vid"
+              loop
+              muted
+              autoPlay
+              controls
+            >
+              <source src={help} type="video/mp4" />
+            </video>
+          </div>
         </div>
       </div>
       <div className={isNotif ? "notifs" : "d-none"}>

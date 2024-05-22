@@ -1159,7 +1159,11 @@ const Products = () => {
                       }}
                     >
                       {categories.map((c, id) => (
-                        <option value={JSON.stringify(c)} key={id}>
+                        <option
+                          className={c.isDeleted ? "d-none" : ""}
+                          value={JSON.stringify(c)}
+                          key={id}
+                        >
                           {c.name}
                         </option>
                       ))}

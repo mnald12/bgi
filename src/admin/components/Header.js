@@ -9,6 +9,7 @@ import { IoWarningOutline } from "react-icons/io5";
 import { TbHelpHexagonFilled } from "react-icons/tb";
 import { FaBell } from "react-icons/fa";
 import moment from "moment";
+import help from "../videos/adminhelp.mp4";
 
 const Header = () => {
   const { setIsLogin, setRole } = useContext(Datas);
@@ -104,6 +105,24 @@ const Header = () => {
             <RiCloseLine />
           </button>
           <h3 className="modal-title">Help</h3>
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              transform: "translateY(-30px)",
+            }}
+          >
+            <video
+              style={{ width: "100%", height: "100%" }}
+              id="vid"
+              loop
+              muted
+              autoPlay
+              controls
+            >
+              <source src={help} type="video/mp4" />
+            </video>
+          </div>
         </div>
       </div>
       <div className={isNotif ? "notifs" : "d-none"}>

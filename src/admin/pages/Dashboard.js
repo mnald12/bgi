@@ -32,7 +32,9 @@ const mapLabel = (arr) => {
   const newArray = [];
 
   for (let i of arr) {
-    newArray.push(i.name);
+    if (!i.isDeleted) {
+      newArray.push(i.name);
+    }
   }
 
   return newArray;
@@ -42,7 +44,9 @@ const mapSale = (arr) => {
   const newArray = [];
 
   for (let i of arr) {
-    newArray.push(i.sales);
+    if (!i.isDeleted) {
+      newArray.push(i.sales);
+    }
   }
 
   return newArray;

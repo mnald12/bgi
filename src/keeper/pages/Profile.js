@@ -23,12 +23,16 @@ const Profile = () => {
     const getProd = async () => {
       const docSnap = await getDoc(doc(db, "users", "keeper"));
       const d = docSnap.data();
-      setProfile(d);
-      setUname(d.username);
-      setName(d.fullName);
-      setAddress(d.address);
-      setEmail(d.email);
-      setNumber(d.number);
+      if (docSnap.exists()) {
+        setProfile(d);
+        setUname(d.username);
+        setName(d.fullName);
+        setAddress(d.address);
+        setEmail(d.email);
+        setNumber(d.number);
+      } else {
+        window.location.reload();
+      }
     };
     getProd();
     setTimeout(() => {
