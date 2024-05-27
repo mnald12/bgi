@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../db/config";
 import { IoWarningOutline } from "react-icons/io5";
+import { HiOutlineEye } from "react-icons/hi";
 
 const Categories = () => {
   const [categories, setCategories] = useState([]);
@@ -24,6 +25,9 @@ const Categories = () => {
   const [idToDelete, setIdToDelete] = useState("");
   const [toUpdateCatId, setToUpdateCatId] = useState("");
   const [toUpdateCatName, setToUpdateCatName] = useState("");
+  const [products, setProducts] = useState([]);
+  const [isCatView, setIsCatView] = useState(false);
+  const [isToView, setIsToView] = useState([]);
 
   useEffect(() => {
     const get = async () => {
@@ -35,6 +39,17 @@ const Categories = () => {
       setCategories(cats);
     };
     get();
+
+    const getProd = async () => {
+      const q = query(collection(db, "products"), orderBy("productName"));
+      const querySnapshot = await getDocs(q);
+      const prods = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+      setProducts(prods);
+    };
+    getProd();
+
     setTimeout(() => {
       setIsloaded(true);
     }, 1000);
@@ -63,6 +78,17 @@ const Categories = () => {
       },
     ]);
     setIsModal(false);
+  };
+
+  const viewCat = async (name) => {
+    const prods = [];
+    for (let i of products) {
+      if (i.category === name) {
+        prods.push(i.productName);
+      }
+    }
+    setIsToView(prods);
+    setIsCatView(true);
   };
 
   const updateCategory = async () => {
@@ -137,6 +163,15 @@ const Categories = () => {
                   })}
                 </td>
                 <td className="btn-flex">
+                  <button
+                    onClick={() => {
+                      viewCat(cat.name);
+                    }}
+                    className="view"
+                    title="view"
+                  >
+                    <HiOutlineEye />
+                  </button>
                   <button
                     className="upd"
                     title="edit"
@@ -239,6 +274,25 @@ const Categories = () => {
             >
               Cancel
             </button>
+          </div>
+        </div>
+        <div className={isCatView ? "modal d-flex" : "modal d-none"}>
+          <div className="modal-body-delete">
+            <button className="modal-close" onClick={() => setIsCatView(false)}>
+              <RiCloseLine />
+            </button>
+            <div>
+              {isToView.length > 0 ? (
+                <>
+                  <h3>Product Lists</h3>
+                  {isToView.map((c, i) => (
+                    <li key={i}>{c}</li>
+                  ))}
+                </>
+              ) : (
+                <h3>No Products</h3>
+              )}
+            </div>
           </div>
         </div>
       </div>

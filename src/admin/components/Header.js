@@ -158,7 +158,7 @@ const Header = () => {
                 ))}
               </>
             ) : (
-              "No notifications"
+              <p style={{ padding: "10px" }}>No notifications</p>
             )}
           </div>
         </div>
