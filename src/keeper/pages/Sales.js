@@ -144,6 +144,9 @@ const Sales = () => {
                 <br />
 
                 <p>
+                  Reciept ID : <span>{prevData.id}</span>
+                </p>
+                <p>
                   Customer : <span>{prevData.customer}</span>
                 </p>
                 <p>

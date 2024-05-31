@@ -31,11 +31,14 @@ const Return = () => {
     bundle: "Bundle",
   };
 
+  const [activeSales, setActiveSales] = useState({});
   const [activeProd, setActiveProd] = useState({});
   const [customer, setCustomer] = useState("");
   const [problem, setProblem] = useState("");
   const [action, setAction] = useState("");
 
+  const [isOk, setIsOk] = useState(false);
+  const [recieptId, setRecieptId] = useState("");
   const [qtyPcs, setQtyPcs] = useState(0);
   const [qtyPack, setQtyPack] = useState(0);
   const [qtyPackPcs, setQtyPackPcs] = useState(0);
@@ -50,6 +53,7 @@ const Return = () => {
   const [qtyBundlePcs, setQtyBundlePcs] = useState(0);
 
   const [isDisabled, setIsDisabled] = useState(true);
+  const [ids, setIds] = useState([]);
 
   useEffect(() => {
     const getProds = async () => {
@@ -80,12 +84,108 @@ const Return = () => {
 
   const options = () => {
     const opts = [];
-    for (let i of products) {
-      opts.push({
-        value: i.id,
-        label: i.productName,
-      });
+    for (let i of ids) {
+      for (let p of products) {
+        if (p.id === i) {
+          opts.push({
+            value: p.id,
+            label: p.productName,
+          });
+          break;
+        }
+      }
     }
+    return opts;
+  };
+
+  const countOptions = () => {
+    const opts = [[], []];
+    for (let i of activeSales.data) {
+      if (i.prodId === activeProd.id) {
+        if (i.unit === unit.piece) {
+          for (let q = 1; q <= i.qty; q++) {
+            opts[0].push({
+              value: q,
+              label: `${q} Pcs`,
+            });
+          }
+        } else if (i.unit === unit.pair) {
+          for (let q = 1; q <= i.qty; q++) {
+            opts[0].push({
+              value: q,
+              label: `${q} Pair`,
+            });
+          }
+        } else if (i.unit === unit.pack) {
+          for (let q = 1; q <= i.qty.pack; q++) {
+            opts[0].push({
+              value: q,
+              label: `${q} Pack`,
+            });
+          }
+          for (let q = 1; q <= i.qty.pcs; q++) {
+            opts[1].push({
+              value: q,
+              label: `${q} Pcs`,
+            });
+          }
+        } else if (i.unit === unit.box) {
+          for (let q = 1; q <= i.qty.box; q++) {
+            opts[0].push({
+              value: q,
+              label: `${q} Box`,
+            });
+          }
+          for (let q = 1; q <= i.qty.pcs; q++) {
+            opts[1].push({
+              value: q,
+              label: `${q} Pcs`,
+            });
+          }
+        } else if (i.unit === unit.roll) {
+          for (let q = 1; q <= i.qty.roll; q++) {
+            opts[0].push({
+              value: q,
+              label: `${q} Roll`,
+            });
+          }
+          for (let q = 1; q <= i.qty.meter; q++) {
+            opts[1].push({
+              value: q,
+              label: `${q} Meter`,
+            });
+          }
+        } else if (i.unit === unit.set) {
+          for (let q = 1; q <= i.qty.set; q++) {
+            opts[0].push({
+              value: q,
+              label: `${q} Set`,
+            });
+          }
+          for (let q = 1; q <= i.qty.pcs; q++) {
+            opts[1].push({
+              value: q,
+              label: `${q} Pcs`,
+            });
+          }
+        } else if (i.unit === unit.bundle) {
+          for (let q = 1; q <= i.qty.bundle; q++) {
+            opts[0].push({
+              value: q,
+              label: `${q} Bundle`,
+            });
+          }
+          for (let q = 1; q <= i.qty.pcs; q++) {
+            opts[1].push({
+              value: q,
+              label: `${q} Pcs`,
+            });
+          }
+        }
+        break;
+      }
+    }
+
     return opts;
   };
 
@@ -126,14 +226,39 @@ const Return = () => {
     }
   };
 
-  const saveReturn = async () => {
-    if (customer === "") {
-      document.getElementById("noname").classList.remove("d-none");
-      setTimeout(() => {
-        document.getElementById("noname").classList.add("d-none");
-      }, 2000);
-      return;
+  const checkId = async () => {
+    const q = query(collection(db, "sales"), orderBy("date", "desc"));
+    const querySnapshot = await getDocs(q);
+    const sales = querySnapshot.docs.map((doc) => {
+      return { id: doc.id, ...doc.data() };
+    });
+
+    let isNotFound = true;
+
+    for (let i of sales) {
+      if (i.id === recieptId) {
+        setActiveSales(i);
+        const newIds = [];
+        for (let p of i.data) {
+          newIds.push(p.prodId);
+        }
+        setIds(newIds);
+        setCustomer(i.customer);
+        isNotFound = false;
+        setIsOk(true);
+        break;
+      }
     }
+
+    if (isNotFound) {
+      document.getElementById("recid").classList.remove("d-none");
+      setTimeout(() => {
+        document.getElementById("recid").classList.add("d-none");
+      }, 2000);
+    }
+  };
+
+  const saveReturn = async () => {
     if (activeProd.unit === unit.piece) {
       if (action === "Replace") {
         await updateDoc(doc(db, "products", activeProd.id), {
@@ -434,6 +559,7 @@ const Return = () => {
       ]);
     }
     setIsModal(false);
+    setIsOk(false);
   };
 
   const searchTable = (e) => {
@@ -516,203 +642,316 @@ const Return = () => {
           </tbody>
         </table>
         <div className={isModal ? "modal d-flex" : "modal d-none"}>
-          <div className="modal-body-delete">
-            <button className="modal-close" onClick={() => setIsModal(false)}>
+          <div className="modal-body-return">
+            <button
+              className="modal-close"
+              onClick={() => {
+                setIsModal(false);
+                setIsOk(false);
+              }}
+            >
               <RiCloseLine />
             </button>
             <h3 className="modal-title">Return Product</h3>
 
-            <div className="input-group w-100">
-              <label>Product</label>
-              <Select
-                options={options()}
-                onChange={(e) => {
-                  getProd(e.value);
-                  setIsDisabled(false);
-                }}
-              />
-            </div>
-            <div
-              className="input-group w-100 mt-12px"
-              style={{ position: "relative" }}
-            >
-              <p
-                id="noname"
-                className="d-none color-red"
-                style={{ position: "absolute", left: "5px", top: "33px" }}
-              >
-                The customer name cannot be left empty
-              </p>
-              <label>Customer Name</label>
-              <input
-                type="text"
-                value={customer}
-                onChange={(e) => setCustomer(e.target.value)}
-              />
-            </div>
+            {isOk ? (
+              <>
+                <div className="input-group w-100">
+                  <label>Product</label>
+                  <Select
+                    options={options()}
+                    onChange={(e) => {
+                      getProd(e.value);
+                      setIsDisabled(false);
+                    }}
+                  />
+                </div>
 
-            <div className="input-group w-100 mt-12px">
-              <label>Problem</label>
-              <Select
-                options={problemOptions()}
-                onChange={(e) => {
-                  setProblem(e.value);
-                  setIsDisabled(false);
-                }}
-              />
-            </div>
+                <div className="d-flex mt-12px" style={{ gap: "10px" }}>
+                  <div className="input-group w-50">
+                    <label>Problem</label>
+                    <Select
+                      options={problemOptions()}
+                      onChange={(e) => {
+                        setProblem(e.value);
+                        setIsDisabled(false);
+                      }}
+                    />
+                  </div>
 
-            <div className="input-group w-100 mt-12px">
-              <label>Action</label>
-              <Select
-                options={actionOptions()}
-                onChange={(e) => {
-                  setAction(e.value);
-                  setIsDisabled(false);
-                }}
-              />
-            </div>
+                  <div className="input-group w-50">
+                    <label>Action</label>
+                    <Select
+                      options={actionOptions()}
+                      onChange={(e) => {
+                        setAction(e.value);
+                        setIsDisabled(false);
+                      }}
+                    />
+                  </div>
+                </div>
 
-            <div className={activeProd.unit === unit.piece ? "" : "d-none"}>
-              <div className="input-group w-100 mt-12px">
-                <label>Qty Pcs</label>
-                <input
-                  type="number"
-                  value={qtyPcs}
-                  onChange={(e) => setQtyPcs(e.target.value)}
-                />
-              </div>
-            </div>
-            <div
-              className={
-                activeProd.unit === unit.pack ? "d-flex gap-10px" : "d-none"
-              }
-            >
-              <div className="input-group w-50 mt-12px">
-                <label>Qty Pack</label>
-                <input
-                  type="number"
-                  value={qtyPack}
-                  onChange={(e) => setQtyPack(e.target.value)}
-                />
-              </div>
-              <div className="input-group w-50 mt-12px">
-                <label>Qty Pcs</label>
-                <input
-                  type="number"
-                  value={qtyPackPcs}
-                  onChange={(e) => setQtyPackPcs(e.target.value)}
-                />
-              </div>
-            </div>
-            <div
-              className={
-                activeProd.unit === unit.box ? "d-flex gap-10px" : "d-none"
-              }
-            >
-              <div className="input-group w-50 mt-12px">
-                <label>Qty Box</label>
-                <input
-                  type="number"
-                  value={qtyBox}
-                  onChange={(e) => setQtyBox(e.target.value)}
-                />
-              </div>
-              <div className="input-group w-50 mt-12px">
-                <label>Qty Pcs</label>
-                <input
-                  type="number"
-                  value={qtyBoxPcs}
-                  onChange={(e) => setQtyBoxPcs(e.target.value)}
-                />
-              </div>
-            </div>
-            <div
-              className={
-                activeProd.unit === unit.roll ? "d-flex gap-10px" : "d-none"
-              }
-            >
-              <div className="input-group w-50 mt-12px">
-                <label>Qty Roll</label>
-                <input
-                  type="number"
-                  value={qtyRoll}
-                  onChange={(e) => setQtyRoll(e.target.value)}
-                />
-              </div>
-              <div className="input-group w-50 mt-12px">
-                <label>Qty Meter</label>
-                <input
-                  type="number"
-                  value={qtyMeter}
-                  onChange={(e) => setQtyMeter(e.target.value)}
-                />
-              </div>
-            </div>
-            <div
-              className={
-                activeProd.unit === unit.set ? "d-flex gap-10px" : "d-none"
-              }
-            >
-              <div className="input-group w-50 mt-12px">
-                <label>Qty Set</label>
-                <input
-                  type="number"
-                  value={qtySet}
-                  onChange={(e) => setQtySet(e.target.value)}
-                />
-              </div>
-              <div className="input-group w-50 mt-12px">
-                <label>Qty Pcs</label>
-                <input
-                  type="number"
-                  value={qtySetPcs}
-                  onChange={(e) => setQtySetPcs(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className={activeProd.unit === unit.pair ? "" : "d-none"}>
-              <div className="input-group w-100 mt-12px">
-                <label>Qty Pair</label>
-                <input
-                  type="number"
-                  value={qtyPair}
-                  onChange={(e) => setQtyPair(e.target.value)}
-                />
-              </div>
-            </div>
-            <div
-              className={
-                activeProd.unit === unit.bundle ? "d-flex gap-10px" : "d-none"
-              }
-            >
-              <div className="input-group w-50 mt-12px">
-                <label>Qty Bundle</label>
-                <input
-                  type="number"
-                  value={qtyBundle}
-                  onChange={(e) => setQtyBundle(e.target.value)}
-                />
-              </div>
-              <div className="input-group w-50 mt-12px">
-                <label>Qty Pcs</label>
-                <input
-                  type="number"
-                  value={qtyBundlePcs}
-                  onChange={(e) => setQtyBundlePcs(e.target.value)}
-                />
-              </div>
-            </div>
+                <div className={activeProd.unit === unit.piece ? "" : "d-none"}>
+                  <div className="counter-select-field mt-12px">
+                    <div className="field-form">
+                      <label>Qty Pcs : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[0]}
+                        onChange={(e) => {
+                          setQtyPcs(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
 
-            <div className="w-100 text-right">
-              <button
-                className="cbtn"
-                onClick={() => saveReturn()}
-                disabled={isDisabled ? true : false}
-              >
-                Save
-              </button>
-            </div>
+                <div className={activeProd.unit === unit.pack ? "" : "d-none"}>
+                  <div
+                    className={
+                      countOptions()[0].length > 0
+                        ? "counter-select-field mt-12px"
+                        : "d-none"
+                    }
+                  >
+                    <div className="field-form">
+                      <label>Qty Pack : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[0]}
+                        onChange={(e) => {
+                          setQtyPack(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    className={
+                      countOptions()[1].length > 0
+                        ? "counter-select-field mt-12px"
+                        : "d-none"
+                    }
+                  >
+                    <div className="field-form">
+                      <label>Qty Pcs : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[1]}
+                        onChange={(e) => {
+                          setQtyPackPcs(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className={activeProd.unit === unit.box ? "" : "d-none"}>
+                  <div
+                    className={
+                      countOptions()[0].length > 0
+                        ? "counter-select-field mt-12px"
+                        : "d-none"
+                    }
+                  >
+                    <div className="field-form">
+                      <label>Qty Box : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[0]}
+                        onChange={(e) => {
+                          setQtyBox(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    className={
+                      countOptions()[1].length > 0
+                        ? "counter-select-field mt-12px"
+                        : "d-none"
+                    }
+                  >
+                    <div className="field-form">
+                      <label>Qty Pcs : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[1]}
+                        onChange={(e) => {
+                          setQtyBoxPcs(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className={activeProd.unit === unit.roll ? "" : "d-none"}>
+                  <div
+                    className={
+                      countOptions()[0].length > 0
+                        ? "counter-select-field mt-12px"
+                        : "d-none"
+                    }
+                  >
+                    <div className="field-form">
+                      <label>Qty Roll : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[0]}
+                        onChange={(e) => {
+                          setQtyRoll(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    className={
+                      countOptions()[1].length > 0
+                        ? "counter-select-field mt-12px"
+                        : "d-none"
+                    }
+                  >
+                    <div className="field-form">
+                      <label>Qty Meter : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[1]}
+                        onChange={(e) => {
+                          setQtyMeter(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className={activeProd.unit === unit.set ? "" : "d-none"}>
+                  <div
+                    className={
+                      countOptions()[0].length > 0
+                        ? "counter-select-field mt-12px"
+                        : "d-none"
+                    }
+                  >
+                    <div className="field-form">
+                      <label>Qty Set : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[0]}
+                        onChange={(e) => {
+                          setQtySet(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    className={
+                      countOptions()[1].length > 0
+                        ? "counter-select-field mt-12px"
+                        : "d-none"
+                    }
+                  >
+                    <div className="field-form">
+                      <label>Qty Pcs : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[1]}
+                        onChange={(e) => {
+                          setQtySetPcs(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className={activeProd.unit === unit.pair ? "" : "d-none"}>
+                  <div className="counter-select-field mt-12px">
+                    <div className="field-form">
+                      <label>Qty Pair : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[0]}
+                        onChange={(e) => {
+                          setQtyPair(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={activeProd.unit === unit.bundle ? "" : "d-none"}
+                >
+                  <div
+                    className={
+                      countOptions()[0].length > 0
+                        ? "counter-select-field mt-12px"
+                        : "d-none"
+                    }
+                  >
+                    <div className="field-form">
+                      <label>Qty Bundle : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[0]}
+                        onChange={(e) => {
+                          setQtyBundle(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div
+                    className={
+                      countOptions()[1].length > 0
+                        ? "counter-select-field mt-12px"
+                        : "d-none"
+                    }
+                  >
+                    <div className="field-form">
+                      <label>Qty Pcs : </label>
+                      <Select
+                        className="selects"
+                        options={countOptions()[1]}
+                        onChange={(e) => {
+                          setQtyBundlePcs(e.value);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="w-100 text-right">
+                  <button
+                    className="cbtn"
+                    onClick={() => saveReturn()}
+                    disabled={isDisabled ? true : false}
+                  >
+                    Save
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <p id="recid" className="d-none color-red">
+                    Reciept ID does not exist!
+                  </p>
+                  <div className="input-group w-100 mt-12px">
+                    <label>Reciept ID :</label>
+                    <input
+                      type="text"
+                      value={recieptId}
+                      onChange={(e) => setRecieptId(e.target.value)}
+                      placeholder="Please enter reciept id"
+                    />
+                  </div>
+
+                  <div className="w-100 text-right">
+                    <button className="cbtn" onClick={() => checkId()}>
+                      Sumbit
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

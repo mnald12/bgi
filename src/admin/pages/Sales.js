@@ -150,7 +150,9 @@ const Sales = () => {
                 <p>(056) 311 4057</p>
 
                 <br />
-
+                <p>
+                  Reciept ID : <span>{prevData.id}</span>
+                </p>
                 <p>
                   Customer : <span>{prevData.customer}</span>
                 </p>

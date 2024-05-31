@@ -51,6 +51,8 @@ const Counter = () => {
   const [total, setTotal] = useState(0);
   const [totalAmmount, setTotalAmmount] = useState(0);
 
+  const [isSaveDisabled, setIsSaveDisabled] = useState(false);
+
   const [customer, setCustomer] = useState("");
   const [sales, setSales] = useState([]);
 
@@ -72,6 +74,8 @@ const Counter = () => {
   const [discount, setDiscount] = useState(0);
   const [totalDiscount, setTotalDiscount] = useState(0);
   const [isPreview, setIsPreview] = useState(false);
+
+  const [saleId, setSaleId] = useState("");
 
   const options2 = (count, unit) => {
     const opts = [];
@@ -202,6 +206,7 @@ const Counter = () => {
   const [fieldData, setFieldData] = useState([]);
 
   const saveSale = async () => {
+    setIsSaveDisabled(true);
     if (customer === "") {
       document.getElementById("pn").classList.remove("d-none");
 
@@ -650,6 +655,8 @@ const Counter = () => {
     });
 
     if (newSale) {
+      setIsSaveDisabled(false);
+      setSaleId(newSale.id);
       setIsPreview(true);
     }
   };
@@ -743,7 +750,11 @@ const Counter = () => {
                   <button className="bg-orange" onClick={() => saveDraft()}>
                     Draft
                   </button>
-                  <button className="bg-green" onClick={() => saveSale()}>
+                  <button
+                    className="bg-green"
+                    onClick={() => saveSale()}
+                    disabled={isSaveDisabled}
+                  >
                     Save
                   </button>
                 </div>
@@ -1739,6 +1750,9 @@ const Counter = () => {
 
                 <br />
 
+                <p>
+                  Reciept ID : <span>{saleId}</span>
+                </p>
                 <p>
                   Customer : <span>{customer}</span>
                 </p>

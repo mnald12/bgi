@@ -266,6 +266,16 @@
   padding: 20px;
 }
 
+.modal-body-return {
+  width: 400px;
+  height: auto;
+  border-radius: 6px;
+  background: white;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  position: relative;
+  padding: 20px;
+}
+
 .text-center {
   text-align: center;
 }
