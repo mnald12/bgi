@@ -932,15 +932,15 @@ const Return = () => {
               <>
                 <div>
                   <p id="recid" className="d-none color-red">
-                    Reciept ID does not exist!
+                    Receipt ID does not exist!
                   </p>
                   <div className="input-group w-100 mt-12px">
-                    <label>Reciept ID :</label>
+                    <label>Receipt ID :</label>
                     <input
                       type="text"
                       value={recieptId}
                       onChange={(e) => setRecieptId(e.target.value)}
-                      placeholder="Please enter reciept id"
+                      placeholder="Please enter receipt id"
                     />
                   </div>
 
