@@ -255,21 +255,9 @@ table td button:hover {
   width: 24% !important;
 }
 
-/* .dashboard,
-.categories,
-.products,
-.sales,
-.accounts,
-.settings,
-.help {
-  animation: slide 1s ease-in-out;
+.retext {
+  padding: 12px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  margin-top: 12px;
+  border-radius: 5px;
 }
-
-@keyframes slide {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-} */

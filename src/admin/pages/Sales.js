@@ -37,6 +37,7 @@ const Sales = () => {
       const sales = querySnapshot.docs.map((doc) => {
         return { id: doc.id, ...doc.data() };
       });
+      sales.sort((b, a) => Date.parse(a.date) - Date.parse(b.date));
       setSales(sales);
       setPrevData(sales[0]);
     };
@@ -76,6 +77,7 @@ const Sales = () => {
           <table>
             <thead>
               <tr>
+                <th>Receipt Id</th>
                 <th>Customer Name</th>
                 <th>Date</th>
                 <th>Sales</th>
@@ -86,6 +88,7 @@ const Sales = () => {
             <tbody id="tbody">
               {sales.map((sale, id) => (
                 <tr key={id}>
+                  <td>{sale.id}</td>
                   <td>{sale.customer}</td>
                   <td>{sale.date}</td>
                   <td>

@@ -73,6 +73,7 @@ const Return = () => {
       const res = querySnapshot.docs.map((doc) => {
         return { id: doc.id, ...doc.data() };
       });
+      res.sort((b, a) => Date.parse(a.date) - Date.parse(b.date));
       setReturns(res);
     };
     get();
@@ -81,6 +82,45 @@ const Return = () => {
       setIsloaded(true);
     }, 1000);
   }, []);
+
+  const updateSalesData = async () => {
+    let newSalesDatas = [];
+    let dataToUpdate = {};
+    for (let i of activeSales.data) {
+      if (i.prodId === activeProd.id) {
+        dataToUpdate = i;
+      } else {
+        newSalesDatas.push(i);
+      }
+    }
+
+    if (activeProd.unit === unit.piece) {
+      dataToUpdate.returned += +qtyPcs;
+    } else if (activeProd.unit === unit.pair) {
+      dataToUpdate.returned += +qtyPair;
+    } else if (activeProd.unit === unit.pack) {
+      dataToUpdate.returned.pack += +qtyPack;
+      dataToUpdate.returned.pcs += +qtyPackPcs;
+    } else if (activeProd.unit === unit.box) {
+      dataToUpdate.returned.box += +qtyBox;
+      dataToUpdate.returned.pcs += +qtyBoxPcs;
+    } else if (activeProd.unit === unit.roll) {
+      dataToUpdate.returned.roll += +qtyRoll;
+      dataToUpdate.returned.meter += +qtyMeter;
+    } else if (activeProd.unit === unit.set) {
+      dataToUpdate.returned.set += +qtySet;
+      dataToUpdate.returned.pcs += +qtySetPcs;
+    } else if (activeProd.unit === unit.bundle) {
+      dataToUpdate.returned.bundle += +qtyBundle;
+      dataToUpdate.returned.pcs += +qtyBundlePcs;
+    }
+
+    newSalesDatas.push(dataToUpdate);
+
+    await updateDoc(doc(db, "sales", activeSales.id), {
+      data: newSalesDatas,
+    });
+  };
 
   const options = () => {
     const opts = [];
@@ -103,79 +143,79 @@ const Return = () => {
     for (let i of activeSales.data) {
       if (i.prodId === activeProd.id) {
         if (i.unit === unit.piece) {
-          for (let q = 1; q <= i.qty; q++) {
+          for (let q = 1; q <= i.qty - i.returned; q++) {
             opts[0].push({
               value: q,
               label: `${q} Pcs`,
             });
           }
         } else if (i.unit === unit.pair) {
-          for (let q = 1; q <= i.qty; q++) {
+          for (let q = 1; q <= i.qty - i.returned; q++) {
             opts[0].push({
               value: q,
               label: `${q} Pair`,
             });
           }
         } else if (i.unit === unit.pack) {
-          for (let q = 1; q <= i.qty.pack; q++) {
+          for (let q = 1; q <= i.qty.pack - i.returned.pack; q++) {
             opts[0].push({
               value: q,
               label: `${q} Pack`,
             });
           }
-          for (let q = 1; q <= i.qty.pcs; q++) {
+          for (let q = 1; q <= i.qty.pcs - i.returned.pcs; q++) {
             opts[1].push({
               value: q,
               label: `${q} Pcs`,
             });
           }
         } else if (i.unit === unit.box) {
-          for (let q = 1; q <= i.qty.box; q++) {
+          for (let q = 1; q <= i.qty.box - i.returned.box; q++) {
             opts[0].push({
               value: q,
               label: `${q} Box`,
             });
           }
-          for (let q = 1; q <= i.qty.pcs; q++) {
+          for (let q = 1; q <= i.qty.pcs - i.returned.pcs; q++) {
             opts[1].push({
               value: q,
               label: `${q} Pcs`,
             });
           }
         } else if (i.unit === unit.roll) {
-          for (let q = 1; q <= i.qty.roll; q++) {
+          for (let q = 1; q <= i.qty.roll - i.returned.roll; q++) {
             opts[0].push({
               value: q,
               label: `${q} Roll`,
             });
           }
-          for (let q = 1; q <= i.qty.meter; q++) {
+          for (let q = 1; q <= i.qty.meter - i.returned.meter; q++) {
             opts[1].push({
               value: q,
               label: `${q} Meter`,
             });
           }
         } else if (i.unit === unit.set) {
-          for (let q = 1; q <= i.qty.set; q++) {
+          for (let q = 1; q <= i.qty.set - i.returned.set; q++) {
             opts[0].push({
               value: q,
               label: `${q} Set`,
             });
           }
-          for (let q = 1; q <= i.qty.pcs; q++) {
+          for (let q = 1; q <= i.qty.pcs - i.returned.pcs; q++) {
             opts[1].push({
               value: q,
               label: `${q} Pcs`,
             });
           }
         } else if (i.unit === unit.bundle) {
-          for (let q = 1; q <= i.qty.bundle; q++) {
+          for (let q = 1; q <= i.qty.bundle - i.returned.bundle; q++) {
             opts[0].push({
               value: q,
               label: `${q} Bundle`,
             });
           }
-          for (let q = 1; q <= i.qty.pcs; q++) {
+          for (let q = 1; q <= i.qty.pcs - i.returned.pcs; q++) {
             opts[1].push({
               value: q,
               label: `${q} Pcs`,
@@ -227,13 +267,14 @@ const Return = () => {
   };
 
   const checkId = async () => {
-    const q = query(collection(db, "sales"), orderBy("date", "desc"));
+    const q = query(collection(db, "sales"));
     const querySnapshot = await getDocs(q);
     const sales = querySnapshot.docs.map((doc) => {
       return { id: doc.id, ...doc.data() };
     });
 
     let isNotFound = true;
+    let isLate = true;
 
     for (let i of sales) {
       if (i.id === recieptId) {
@@ -245,16 +286,35 @@ const Return = () => {
         setIds(newIds);
         setCustomer(i.customer);
         isNotFound = false;
-        setIsOk(true);
+
+        let date1 = new Date(`${i.dates.month}/${i.dates.day}/${i.dates.year}`);
+        let date2 = new Date(moment().format("L"));
+        let td = date2.getTime() - date1.getTime();
+        let dd = Math.round(td / (1000 * 3600 * 24));
+
+        if (dd <= 3) {
+          isLate = false;
+          setIsOk(true);
+        }
+
         break;
       }
     }
 
     if (isNotFound) {
+      isLate = false;
       document.getElementById("recid").classList.remove("d-none");
       setTimeout(() => {
+        isLate = true;
         document.getElementById("recid").classList.add("d-none");
-      }, 2000);
+      }, 3000);
+    }
+
+    if (isLate) {
+      document.getElementById("recids").classList.remove("d-none");
+      setTimeout(() => {
+        document.getElementById("recids").classList.add("d-none");
+      }, 5000);
     }
   };
 
@@ -558,6 +618,17 @@ const Return = () => {
         },
       ]);
     }
+
+    updateSalesData();
+
+    setActiveSales({});
+    setActiveProd({});
+    setCustomer("");
+    setProblem("");
+    setAction("");
+    setIsDisabled(true);
+    setIds([]);
+    setRecieptId("");
     setIsModal(false);
     setIsOk(false);
   };
@@ -646,6 +717,9 @@ const Return = () => {
             <button
               className="modal-close"
               onClick={() => {
+                setActiveSales({});
+                setActiveProd({});
+                setIsDisabled(true);
                 setIsModal(false);
                 setIsOk(false);
               }}
@@ -661,8 +735,8 @@ const Return = () => {
                   <Select
                     options={options()}
                     onChange={(e) => {
+                      setIsDisabled(true);
                       getProd(e.value);
-                      setIsDisabled(false);
                     }}
                   />
                 </div>
@@ -674,7 +748,6 @@ const Return = () => {
                       options={problemOptions()}
                       onChange={(e) => {
                         setProblem(e.value);
-                        setIsDisabled(false);
                       }}
                     />
                   </div>
@@ -685,28 +758,46 @@ const Return = () => {
                       options={actionOptions()}
                       onChange={(e) => {
                         setAction(e.value);
-                        setIsDisabled(false);
                       }}
                     />
                   </div>
                 </div>
 
                 <div className={activeProd.unit === unit.piece ? "" : "d-none"}>
-                  <div className="counter-select-field mt-12px">
-                    <div className="field-form">
-                      <label>Qty Pcs : </label>
-                      <Select
-                        className="selects"
-                        options={countOptions()[0]}
-                        onChange={(e) => {
-                          setQtyPcs(e.value);
-                        }}
-                      />
-                    </div>
-                  </div>
+                  {countOptions()[0].length > 0 ? (
+                    <>
+                      <div className="counter-select-field mt-12px">
+                        <div className="field-form">
+                          <label>Qty Pcs : </label>
+                          <Select
+                            className="selects"
+                            options={countOptions()[0]}
+                            onChange={(e) => {
+                              setQtyPcs(e.value);
+                              if (e.value > 0) {
+                                setIsDisabled(false);
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p className="retext color-red">
+                        Product already returned
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 <div className={activeProd.unit === unit.pack ? "" : "d-none"}>
+                  {countOptions()[0].length < 1 &&
+                  countOptions()[1].length < 1 ? (
+                    <p className="retext color-red">Product already returned</p>
+                  ) : (
+                    ""
+                  )}
                   <div
                     className={
                       countOptions()[0].length > 0
@@ -721,6 +812,9 @@ const Return = () => {
                         options={countOptions()[0]}
                         onChange={(e) => {
                           setQtyPack(e.value);
+                          if (e.value > 0) {
+                            setIsDisabled(false);
+                          }
                         }}
                       />
                     </div>
@@ -739,6 +833,9 @@ const Return = () => {
                         options={countOptions()[1]}
                         onChange={(e) => {
                           setQtyPackPcs(e.value);
+                          if (e.value > 0) {
+                            setIsDisabled(false);
+                          }
                         }}
                       />
                     </div>
@@ -746,6 +843,12 @@ const Return = () => {
                 </div>
 
                 <div className={activeProd.unit === unit.box ? "" : "d-none"}>
+                  {countOptions()[0].length < 1 &&
+                  countOptions()[1].length < 1 ? (
+                    <p className="retext color-red">Product already returned</p>
+                  ) : (
+                    ""
+                  )}
                   <div
                     className={
                       countOptions()[0].length > 0
@@ -760,6 +863,9 @@ const Return = () => {
                         options={countOptions()[0]}
                         onChange={(e) => {
                           setQtyBox(e.value);
+                          if (e.value > 0) {
+                            setIsDisabled(false);
+                          }
                         }}
                       />
                     </div>
@@ -778,6 +884,9 @@ const Return = () => {
                         options={countOptions()[1]}
                         onChange={(e) => {
                           setQtyBoxPcs(e.value);
+                          if (e.value > 0) {
+                            setIsDisabled(false);
+                          }
                         }}
                       />
                     </div>
@@ -785,6 +894,12 @@ const Return = () => {
                 </div>
 
                 <div className={activeProd.unit === unit.roll ? "" : "d-none"}>
+                  {countOptions()[0].length < 1 &&
+                  countOptions()[1].length < 1 ? (
+                    <p className="retext color-red">Product already returned</p>
+                  ) : (
+                    ""
+                  )}
                   <div
                     className={
                       countOptions()[0].length > 0
@@ -799,6 +914,9 @@ const Return = () => {
                         options={countOptions()[0]}
                         onChange={(e) => {
                           setQtyRoll(e.value);
+                          if (e.value > 0) {
+                            setIsDisabled(false);
+                          }
                         }}
                       />
                     </div>
@@ -817,6 +935,9 @@ const Return = () => {
                         options={countOptions()[1]}
                         onChange={(e) => {
                           setQtyMeter(e.value);
+                          if (e.value > 0) {
+                            setIsDisabled(false);
+                          }
                         }}
                       />
                     </div>
@@ -824,6 +945,12 @@ const Return = () => {
                 </div>
 
                 <div className={activeProd.unit === unit.set ? "" : "d-none"}>
+                  {countOptions()[0].length < 1 &&
+                  countOptions()[1].length < 1 ? (
+                    <p className="retext color-red">Product already returned</p>
+                  ) : (
+                    ""
+                  )}
                   <div
                     className={
                       countOptions()[0].length > 0
@@ -838,6 +965,9 @@ const Return = () => {
                         options={countOptions()[0]}
                         onChange={(e) => {
                           setQtySet(e.value);
+                          if (e.value > 0) {
+                            setIsDisabled(false);
+                          }
                         }}
                       />
                     </div>
@@ -856,6 +986,9 @@ const Return = () => {
                         options={countOptions()[1]}
                         onChange={(e) => {
                           setQtySetPcs(e.value);
+                          if (e.value > 0) {
+                            setIsDisabled(false);
+                          }
                         }}
                       />
                     </div>
@@ -863,23 +996,42 @@ const Return = () => {
                 </div>
 
                 <div className={activeProd.unit === unit.pair ? "" : "d-none"}>
-                  <div className="counter-select-field mt-12px">
-                    <div className="field-form">
-                      <label>Qty Pair : </label>
-                      <Select
-                        className="selects"
-                        options={countOptions()[0]}
-                        onChange={(e) => {
-                          setQtyPair(e.value);
-                        }}
-                      />
-                    </div>
-                  </div>
+                  {countOptions()[0].length > 0 ? (
+                    <>
+                      <div className="counter-select-field mt-12px">
+                        <div className="field-form">
+                          <label>Qty Pair : </label>
+                          <Select
+                            className="selects"
+                            options={countOptions()[0]}
+                            onChange={(e) => {
+                              setQtyPair(e.value);
+                              if (e.value > 0) {
+                                setIsDisabled(false);
+                              }
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p className="retext color-red">
+                        Product already returned
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 <div
                   className={activeProd.unit === unit.bundle ? "" : "d-none"}
                 >
+                  {countOptions()[0].length < 1 &&
+                  countOptions()[1].length < 1 ? (
+                    <p className="retext color-red">Product already returned</p>
+                  ) : (
+                    ""
+                  )}
                   <div
                     className={
                       countOptions()[0].length > 0
@@ -894,6 +1046,9 @@ const Return = () => {
                         options={countOptions()[0]}
                         onChange={(e) => {
                           setQtyBundle(e.value);
+                          if (e.value > 0) {
+                            setIsDisabled(false);
+                          }
                         }}
                       />
                     </div>
@@ -912,6 +1067,9 @@ const Return = () => {
                         options={countOptions()[1]}
                         onChange={(e) => {
                           setQtyBundlePcs(e.value);
+                          if (e.value > 0) {
+                            setIsDisabled(false);
+                          }
                         }}
                       />
                     </div>
@@ -934,6 +1092,12 @@ const Return = () => {
                   <p id="recid" className="d-none color-red">
                     Receipt ID does not exist!
                   </p>
+
+                  <p id="recids" className="d-none color-red">
+                    The warranty is no longer valid! Product returns are not
+                    allowed.
+                  </p>
+
                   <div className="input-group w-100 mt-12px">
                     <label>Receipt ID :</label>
                     <input

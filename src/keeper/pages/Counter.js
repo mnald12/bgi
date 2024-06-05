@@ -206,7 +206,6 @@ const Counter = () => {
   const [fieldData, setFieldData] = useState([]);
 
   const saveSale = async () => {
-    setIsSaveDisabled(true);
     if (customer === "") {
       document.getElementById("pn").classList.remove("d-none");
 
@@ -216,6 +215,7 @@ const Counter = () => {
 
       return;
     }
+    setIsSaveDisabled(true);
 
     const newSalesData = [];
     let incomes = 0;
@@ -1415,6 +1415,7 @@ const Counter = () => {
                         qty: qtyPiece,
                         price: data.price,
                         total: data.price * qtyPiece,
+                        returned: 0,
                       },
                     ]);
                   }
@@ -1462,6 +1463,10 @@ const Counter = () => {
                         total:
                           data.price.pack * qtyPack +
                           data.price.pcs * qtyPackPcs,
+                        returned: {
+                          pack: 0,
+                          pcs: 0,
+                        },
                       },
                     ]);
                   }
@@ -1507,6 +1512,10 @@ const Counter = () => {
                         },
                         total:
                           data.price.box * qtyBox + data.price.pcs * qtyBoxPcs,
+                        returned: {
+                          box: 0,
+                          pcs: 0,
+                        },
                       },
                     ]);
                   }
@@ -1554,6 +1563,10 @@ const Counter = () => {
                         total:
                           data.price.roll * qtyRoll +
                           data.price.meter * qtyMeter,
+                        returned: {
+                          roll: 0,
+                          meter: 0,
+                        },
                       },
                     ]);
                   }
@@ -1599,6 +1612,10 @@ const Counter = () => {
                         },
                         total:
                           data.price.set * qtySet + data.price.pcs * qtySetPcs,
+                        returned: {
+                          set: 0,
+                          pcs: 0,
+                        },
                       },
                     ]);
                   }
@@ -1626,6 +1643,7 @@ const Counter = () => {
                         qty: qtyPair,
                         price: data.price,
                         total: data.price * qtyPair,
+                        returned: 0,
                       },
                     ]);
                   }
@@ -1673,6 +1691,10 @@ const Counter = () => {
                         total:
                           data.price.bundle * qtyBundle +
                           data.price.pcs * qtyBundlePcs,
+                        returned: {
+                          bundle: 0,
+                          pcs: 0,
+                        },
                       },
                     ]);
                   }

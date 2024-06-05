@@ -25,6 +25,7 @@ const Return = () => {
       const res = querySnapshot.docs.map((doc) => {
         return { id: doc.id, ...doc.data() };
       });
+      res.sort((b, a) => Date.parse(a.date) - Date.parse(b.date));
       setReturns(res);
     };
     get();
