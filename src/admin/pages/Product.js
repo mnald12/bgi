@@ -37,10 +37,80 @@ const Product = () => {
     bundle: "Bundle",
   };
 
+  const [returned, setReturned] = useState(null);
+
   useEffect(() => {
     const getProd = async () => {
       const docSnap = await getDoc(doc(db, "products", productId));
-      setProduct(docSnap.data());
+      const p = docSnap.data();
+      if (p.unit === unit.piece) {
+        const d = p.stocks + p.sold;
+        setReturned(p.totalStocks - d);
+      } else if (p.unit === unit.pair) {
+        const d = p.stocks + p.sold;
+        setReturned(p.totalStocks - d);
+      } else if (p.unit === unit.pack) {
+        let diff = {
+          pack: 0,
+          pcs: 0,
+        };
+        let c = p.totalStocks.pack * p.pcsPerPack + p.totalStocks.pcs;
+        let c1 = p.stocks.pack * p.pcsPerPack + p.stocks.pcs;
+        let c2 = p.sold.pack * p.pcsPerPack + p.sold.pcs;
+        let d = c - (c1 + c2);
+        diff.pack = Math.floor(d / p.pcsPerPack);
+        diff.pcs = d % p.pcsPerPack;
+        setReturned(diff);
+      } else if (p.unit === unit.box) {
+        let diff = {
+          box: 0,
+          pcs: 0,
+        };
+        let c = p.totalStocks.box * p.pcsPerBox + p.totalStocks.pcs;
+        let c1 = p.stocks.box * p.pcsPerBox + p.stocks.pcs;
+        let c2 = p.sold.box * p.pcsPerBox + p.sold.pcs;
+        let d = c - (c1 + c2);
+        diff.box = Math.floor(d / p.pcsPerBox);
+        diff.pcs = d % p.pcsPerBox;
+        setReturned(diff);
+      } else if (p.unit === unit.roll) {
+        let diff = {
+          roll: 0,
+          meter: 0,
+        };
+        let c = p.totalStocks.roll * p.meterPerRoll + p.totalStocks.meter;
+        let c1 = p.stocks.roll * p.meterPerRoll + p.stocks.meter;
+        let c2 = p.sold.roll * p.meterPerRoll + p.sold.meter;
+        let d = c - (c1 + c2);
+        diff.roll = Math.floor(d / p.meterPerRoll);
+        diff.meter = d % p.meterPerRoll;
+        setReturned(diff);
+      } else if (p.unit === unit.set) {
+        let diff = {
+          set: 0,
+          pcs: 0,
+        };
+        let c = p.totalStocks.set * p.pcsPerSet + p.totalStocks.pcs;
+        let c1 = p.stocks.set * p.pcsPerSet + p.stocks.pcs;
+        let c2 = p.sold.set * p.pcsPerSet + p.sold.pcs;
+        let d = c - (c1 + c2);
+        diff.set = Math.floor(d / p.pcsPerSet);
+        diff.pcs = d % p.pcsPerSet;
+        setReturned(diff);
+      } else if (p.unit === unit.bundle) {
+        let diff = {
+          bundle: 0,
+          pcs: 0,
+        };
+        let c = p.totalStocks.bundle * p.pcsPerBundle + p.totalStocks.pcs;
+        let c1 = p.stocks.bundle * p.pcsPerBundle + p.stocks.pcs;
+        let c2 = p.sold.bundle * p.pcsPerBundle + p.sold.pcs;
+        let d = c - (c1 + c2);
+        diff.bundle = Math.floor(d / p.pcsPerBundle);
+        diff.pcs = d % p.pcsPerBundle;
+        setReturned(diff);
+      }
+      setProduct(p);
     };
     getProd();
 
@@ -57,7 +127,16 @@ const Product = () => {
     setTimeout(() => {
       setIsloaded(true);
     }, 1000);
-  }, [productId]);
+  }, [
+    productId,
+    unit.box,
+    unit.bundle,
+    unit.pack,
+    unit.pair,
+    unit.piece,
+    unit.roll,
+    unit.set,
+  ]);
 
   const [isUpModal, setIsUpModal] = useState(false);
   const [img2, setImg2] = useState(null);
@@ -974,6 +1053,12 @@ const Product = () => {
                       })}
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <b>Returned</b>
+                    </td>
+                    <td>{returned} Pcs</td>
+                  </tr>
                 </table>
               ) : product.unit === unit.pack ? (
                 <table className="tbl">
@@ -1076,6 +1161,15 @@ const Product = () => {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Returned</b>
+                    </td>
+                    <td>
+                      {`${returned.pack} Pack & 
+                        ${returned.pcs} Pcs`}
                     </td>
                   </tr>
                 </table>
@@ -1182,6 +1276,15 @@ const Product = () => {
                       })}
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <b>Returned</b>
+                    </td>
+                    <td>
+                      {`${returned.box} Box's & 
+                        ${returned.pcs} Pcs`}
+                    </td>
+                  </tr>
                 </table>
               ) : product.unit === unit.roll ? (
                 <table className="tbl">
@@ -1284,6 +1387,15 @@ const Product = () => {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Returned</b>
+                    </td>
+                    <td>
+                      {`${returned.roll} Roll & 
+                        ${returned.meter} Meter`}
                     </td>
                   </tr>
                 </table>
@@ -1390,6 +1502,15 @@ const Product = () => {
                       })}
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <b>Returned</b>
+                    </td>
+                    <td>
+                      {`${returned.set} Set's & 
+                        ${returned.pcs} Pcs`}
+                    </td>
+                  </tr>
                 </table>
               ) : product.unit === unit.pair ? (
                 <table className="tbl">
@@ -1477,6 +1598,12 @@ const Product = () => {
                       })}
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <b>Returned</b>
+                    </td>
+                    <td>{returned} Pair</td>
+                  </tr>
                 </table>
               ) : product.unit === unit.bundle ? (
                 <table className="tbl">
@@ -1495,7 +1622,7 @@ const Product = () => {
                     </td>
                     <td>
                       {product.stocks.bundle > 0 || product.stocks.pcs > 0 ? (
-                        `${product.stocks.bundle} Bundle and ${product.stocks.bundle} Pcs`
+                        `${product.stocks.bundle} Bundle and ${product.stocks.pcs} Pcs`
                       ) : (
                         <p style={{ color: "red" }}>Out of stock</p>
                       )}
@@ -1579,6 +1706,15 @@ const Product = () => {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b>Returned</b>
+                    </td>
+                    <td>
+                      {`${returned.bundle} Bundle's & 
+                        ${returned.pcs} Pcs`}
                     </td>
                   </tr>
                 </table>
