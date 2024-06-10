@@ -312,8 +312,14 @@
   background-color: forestgreen;
   margin-right: 0 !important;
 }
+.saves {
+  background-color: forestgreen;
+}
 
 .save:hover {
+  background-color: rgba(34, 139, 34, 0.626);
+}
+.saves:hover {
   background-color: rgba(34, 139, 34, 0.626);
 }
 
